@@ -1,0 +1,11 @@
+.item-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.item-list__vacio {
+  margin: 0;
+  text-align: center;
+  color: var(--color-violeta);
+}

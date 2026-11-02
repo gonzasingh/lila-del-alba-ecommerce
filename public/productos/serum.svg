@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Sérum hidratante">
+  <rect width="400" height="300" fill="#fef7ff"/>
+  <circle cx="200" cy="158" r="108" fill="#e5e0ef"/>
+  <ellipse cx="200" cy="240" rx="68" ry="10" fill="#6750a4" opacity=".16"/>
+  <path d="M186 104 V76 a14 14 0 0 1 28 0 V104 Z" fill="#4a3877"/>
+  <rect x="174" y="100" width="52" height="26" rx="6" fill="#6750a4"/>
+  <rect x="162" y="122" width="76" height="118" rx="18" fill="#fff7e3" stroke="#6750a4" stroke-width="4"/>
+  <rect x="169" y="164" width="62" height="70" rx="12" fill="#b8a4fa" opacity=".75"/>
+  <rect x="172" y="132" width="8" height="40" rx="4" fill="#fff" opacity=".7"/>
+  <path d="M296 86 l5 14 14 5 -14 5 -5 14 -5 -14 -14 -5 14 -5 Z" fill="#b8a4fa"/>
+  <path d="M104 190 l3.5 9 9 3.5 -9 3.5 -3.5 9 -3.5 -9 -9 -3.5 9 -3.5 Z" fill="#b8a4fa"/>
+</svg>

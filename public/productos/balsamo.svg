@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Bálsamo labial">
+  <rect width="400" height="300" fill="#fff7e3"/>
+  <ellipse cx="205" cy="246" rx="96" ry="12" fill="#6750a4" opacity=".14"/>
+  <g transform="rotate(-24 200 160)">
+    <rect x="176" y="70" width="48" height="56" rx="16" fill="#f3d9a4"/>
+    <rect x="184" y="78" width="8" height="30" rx="4" fill="#fff" opacity=".5"/>
+    <rect x="162" y="118" width="76" height="18" rx="6" fill="#6750a4"/>
+    <rect x="166" y="132" width="68" height="104" rx="12" fill="#b8a4fa"/>
+    <rect x="166" y="164" width="68" height="28" fill="#fef7ff"/>
+    <circle cx="200" cy="178" r="7" fill="#6750a4"/>
+  </g>
+</svg>
