@@ -1,7 +1,12 @@
 :root {
-  --color-lila: #a78bfa;
-  --color-violeta: #5b3f9e;
-  --color-fondo: #fcf7ff;
+  /* Paleta de Lila del Alba (tomada de la lista de precios de la marca) */
+  --color-lila: #b8a4fa;
+  --color-violeta: #6750a4;
+  --color-violeta-oscuro: #4a3877;
+  --color-fondo: #fef7ff;
+  --color-lavanda: #e5e0ef;
+  --color-crema: #fff7e3;
+  --color-texto: #3b2f4f;
 }
 
 * {
@@ -10,7 +15,18 @@
 
 body {
   margin: 0;
-  font-family: system-ui, Arial, sans-serif;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
   background-color: var(--color-fondo);
-  color: var(--color-violeta);
+  color: var(--color-texto);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
