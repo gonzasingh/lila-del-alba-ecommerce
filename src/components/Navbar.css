@@ -1,0 +1,85 @@
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: rgba(254, 247, 255, 0.95);
+  border-bottom: 1px solid var(--color-lavanda);
+  box-shadow: 0 2px 12px rgba(103, 80, 164, 0.08);
+  backdrop-filter: blur(6px);
+}
+
+.navbar__contenido {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.75rem 1.5rem;
+}
+
+/* Logo a la izquierda: el margen automático empuja categorías y carrito a la derecha */
+.navbar__marca {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-right: auto;
+}
+
+.navbar__logo {
+  height: 40px;
+  width: auto;
+}
+
+.navbar__nombre {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--color-violeta);
+}
+
+.navbar__lista {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.navbar__enlace {
+  display: block;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-violeta);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.navbar__enlace:hover {
+  background-color: var(--color-lavanda);
+  color: var(--color-violeta-oscuro);
+}
+
+.navbar__enlace:focus-visible,
+.navbar__marca:focus-visible {
+  outline: 3px solid var(--color-lila);
+  outline-offset: 2px;
+}
+
+/* En pantallas chicas: logo y carrito arriba, categorías en una segunda fila con scroll */
+@media (max-width: 900px) {
+  .navbar__contenido {
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .navbar__categorias {
+    order: 3;
+    flex-basis: 100%;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+  }
+
+  .navbar__lista {
+    width: max-content;
+  }
+}
