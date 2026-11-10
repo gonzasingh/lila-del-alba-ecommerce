@@ -1,17 +1,7 @@
 import CartWidget from './CartWidget'
+import { CATEGORIAS } from '../mock/categories'
 import logoFlor from '../assets/logo-flor.png'
 import './Navbar.css'
-
-// Categorías de productos de la tienda (según la lista de precios de la marca)
-const CATEGORIAS = [
-  { id: 'jabones', nombre: 'Jabones' },
-  { id: 'cremas', nombre: 'Cremas' },
-  { id: 'aceites', nombre: 'Aceites' },
-  { id: 'serum', nombre: 'Sérum' },
-  { id: 'balsamo', nombre: 'Bálsamo' },
-  { id: 'ducha', nombre: 'Ducha' },
-  { id: 'hogar', nombre: 'Hogar' },
-]
 
 function Navbar() {
   return (

@@ -1,0 +1,139 @@
+.item-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2rem;
+}
+
+.item-detail__imagen {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border: 1px solid var(--color-lavanda);
+  border-radius: 20px;
+  background-color: var(--color-lavanda);
+}
+
+.item-detail__info {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.item-detail__categoria {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-violeta);
+}
+
+.item-detail__nombre {
+  margin: -0.5rem 0 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.7rem, 4vw, 2.4rem);
+  line-height: 1.15;
+  color: var(--color-violeta-oscuro);
+}
+
+.item-detail__precios {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 1rem;
+}
+
+.item-detail__precio {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-violeta);
+}
+
+.item-detail__pack {
+  margin: 0;
+  padding: 0.25rem 0.8rem;
+  border-radius: 999px;
+  background-color: var(--color-crema);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-violeta-oscuro);
+}
+
+.item-detail__descripcion {
+  max-width: 60ch;
+  margin: 0;
+  line-height: 1.65;
+}
+
+.item-detail__ficha {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.4rem 1.25rem;
+  margin: 0;
+}
+
+.item-detail__ficha dt {
+  font-weight: 700;
+  color: var(--color-violeta);
+}
+
+.item-detail__ficha dd {
+  margin: 0;
+}
+
+.item-detail__subtitulo {
+  margin: 0 0 0.5rem;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.15rem;
+  color: var(--color-violeta-oscuro);
+}
+
+.item-detail__caracteristicas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding-left: 1.2rem;
+  list-style: disc;
+}
+
+.item-detail__aromas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.item-detail__aromas li {
+  padding: 0.25rem 0.8rem;
+  border-radius: 999px;
+  background-color: var(--color-lavanda);
+  font-size: 0.88rem;
+  color: var(--color-violeta-oscuro);
+}
+
+.item-detail__compra {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--color-lavanda);
+}
+
+.item-detail__stock {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-violeta-oscuro);
+}
+
+.item-detail__confirmacion {
+  margin: 0;
+  color: var(--color-violeta);
+  font-weight: 600;
+}
+
+@media (min-width: 800px) {
+  .item-detail {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 3rem;
+    align-items: start;
+  }
+}

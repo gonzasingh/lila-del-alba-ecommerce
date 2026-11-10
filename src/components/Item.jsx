@@ -1,35 +1,31 @@
+import { getNombreCategoria } from '../mock/categories'
+import { formatearPrecio } from '../utils/formatearPrecio'
 import './Item.css'
 
-// Formatea el precio como pesos argentinos, por ejemplo $ 4.500
-const formatearPrecio = (valor) =>
-  new Intl.NumberFormat('es-AR', {
-    style: 'currency',
-    currency: 'ARS',
-    maximumFractionDigits: 0,
-  }).format(valor)
-
-// Aviso de stock: solo se muestra cuando quedan pocas unidades
-const textoStock = (stock) => {
-  if (stock === 0) return 'Sin stock'
-  if (stock === 1) return '¡Última unidad!'
-  if (stock <= 5) return `¡Últimas ${stock} unidades!`
-  return null
-}
-
-// Item solo se ocupa de mostrar la card de un producto que recibe por props
-function Item({ product }) {
-  const { name, price, img, description, stock } = product
-  const avisoStock = textoStock(stock)
+// Item solo muestra la información resumida de un producto (imagen, categoría, nombre y precio).
+// El resto de los datos se ven en el detalle (ItemDetail).
+// onVerDetalle es opcional: si llega, la card muestra el botón "Ver detalle".
+function Item({ product, onVerDetalle }) {
+  const { id, name, price, category, img } = product
 
   return (
     <article className="item">
       <img className="item__imagen" src={img} alt={name} loading="lazy" />
       <div className="item__cuerpo">
+        <p className="item__categoria">{getNombreCategoria(category)}</p>
         <h2 className="item__nombre">{name}</h2>
-        <p className="item__descripcion">{description}</p>
         <div className="item__pie">
           <p className="item__precio">{formatearPrecio(price)}</p>
-          {avisoStock && <p className="item__stock">{avisoStock}</p>}
+          {onVerDetalle && (
+            <button
+              type="button"
+              className="item__boton"
+              onClick={() => onVerDetalle(id)}
+              aria-label={`Ver detalle de ${name}`}
+            >
+              Ver detalle
+            </button>
+          )}
         </div>
       </div>
     </article>

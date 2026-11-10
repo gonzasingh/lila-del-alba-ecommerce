@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Difusor para auto">
+  <rect width="400" height="300" fill="#e5e0ef"/>
+  <ellipse cx="200" cy="248" rx="84" ry="11" fill="#6750a4" opacity=".16"/>
+  <path d="M176 112 C176 36 224 36 224 112" fill="none" stroke="#4a3877" stroke-width="4" stroke-linecap="round"/>
+  <rect x="170" y="104" width="60" height="30" rx="7" fill="#b08968"/>
+  <rect x="176" y="110" width="48" height="6" rx="3" fill="#fff" opacity=".3"/>
+  <rect x="156" y="130" width="88" height="112" rx="22" fill="#fff7e3" stroke="#6750a4" stroke-width="4"/>
+  <rect x="164" y="174" width="72" height="60" rx="14" fill="#b8a4fa" opacity=".65"/>
+  <rect x="172" y="150" width="56" height="34" rx="8" fill="#fef7ff"/>
+  <g fill="#6750a4">
+    <circle cx="200" cy="159" r="3.5"/><circle cx="200" cy="173" r="3.5"/>
+    <circle cx="193" cy="166" r="3.5"/><circle cx="207" cy="166" r="3.5"/>
+  </g>
+</svg>

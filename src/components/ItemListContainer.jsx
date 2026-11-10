@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
 import { getProducts } from '../mock/asyncMock'
 import ItemList from './ItemList'
+import Cargando from './Cargando'
 import './ItemListContainer.css'
 
-function ItemListContainer({ greeting }) {
+// onVerDetalle (opcional): se reenvía a ItemList para abrir el detalle de un producto
+function ItemListContainer({ greeting, onVerDetalle }) {
   // Productos obtenidos de la "API". Arranca como un array vacío
   const [items, setItems] = useState([])
   const [cargando, setCargando] = useState(true)
@@ -36,20 +38,15 @@ function ItemListContainer({ greeting }) {
     <main className="item-list-container">
       <h1 className="item-list-container__saludo">{greeting}</h1>
 
-      {cargando && (
-        <p className="item-list-container__estado" role="status">
-          <span className="item-list-container__spinner" aria-hidden="true" />
-          Cargando productos...
-        </p>
-      )}
+      {cargando && <Cargando mensaje="Cargando productos..." />}
 
       {error && (
-        <p className="item-list-container__estado" role="alert">
+        <p className="item-list-container__error" role="alert">
           No pudimos cargar los productos. Intentá de nuevo en unos minutos.
         </p>
       )}
 
-      {!cargando && !error && <ItemList items={items} />}
+      {!cargando && !error && <ItemList items={items} onVerDetalle={onVerDetalle} />}
     </main>
   )
 }
