@@ -130,6 +130,16 @@
   font-weight: 600;
 }
 
+.item-detail__enlace {
+  color: var(--color-violeta-oscuro);
+  text-decoration: underline;
+}
+
+.item-detail__enlace:focus-visible {
+  outline: 3px solid var(--color-lila);
+  outline-offset: 2px;
+}
+
 @media (min-width: 800px) {
   .item-detail {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);

@@ -58,6 +58,12 @@
   color: var(--color-violeta-oscuro);
 }
 
+/* Categoría que se está viendo */
+.navbar__enlace--activo {
+  background-color: var(--color-lavanda);
+  color: var(--color-violeta-oscuro);
+}
+
 .navbar__enlace:focus-visible,
 .navbar__marca:focus-visible {
   outline: 3px solid var(--color-lila);

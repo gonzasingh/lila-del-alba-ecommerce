@@ -1,12 +1,14 @@
-import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import ItemCount from './ItemCount'
 import { getNombreCategoria } from '../mock/categories'
 import { formatearPrecio } from '../utils/formatearPrecio'
 import './ItemDetail.css'
 
 // ItemDetail recibe un producto por props y muestra TODA su información.
-// No busca datos: eso lo hace ItemDetailContainer.
-function ItemDetail({ product }) {
+// No busca datos ni toca el carrito: eso lo hace ItemDetailContainer, que le pasa
+//  - cantidadEnCarrito: cuántas unidades de este producto ya están en el carrito
+//  - onAdd: función a ejecutar cuando el cliente confirma una cantidad
+function ItemDetail({ product, cantidadEnCarrito = 0, onAdd }) {
   const {
     name,
     price,
@@ -21,8 +23,8 @@ function ItemDetail({ product }) {
     aromas = [],
   } = product
 
-  // Cantidad que el cliente confirmó con ItemCount (el carrito llega en una próxima entrega)
-  const [agregado, setAgregado] = useState(0)
+  // Lo que todavía se puede agregar: el stock menos lo que ya está en el carrito
+  const disponible = stock - cantidadEnCarrito
 
   const textoStock =
     stock === 0 ? 'Sin stock' : `Stock disponible: ${stock} ${stock === 1 ? 'unidad' : 'unidades'}`
@@ -87,10 +89,15 @@ function ItemDetail({ product }) {
 
         <div className="item-detail__compra">
           <p className="item-detail__stock">{textoStock}</p>
-          <ItemCount stock={stock} onAdd={setAgregado} />
-          {agregado > 0 && (
+          {/* Con key, el contador se reinicia después de cada "Agregar al carrito" */}
+          <ItemCount key={cantidadEnCarrito} stock={disponible} onAdd={onAdd} />
+          {cantidadEnCarrito > 0 && (
             <p className="item-detail__confirmacion" role="status">
-              Agregaste {agregado} {agregado === 1 ? 'unidad' : 'unidades'} al carrito.
+              Tenés {cantidadEnCarrito} {cantidadEnCarrito === 1 ? 'unidad' : 'unidades'} de este
+              producto en el carrito.{' '}
+              <Link className="item-detail__enlace" to="/cart">
+                Ir al carrito
+              </Link>
             </p>
           )}
         </div>

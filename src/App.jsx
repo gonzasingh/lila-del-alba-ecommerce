@@ -1,22 +1,25 @@
-import { useState } from 'react'
+import { Routes, Route } from 'react-router-dom'
+import CartProvider from './context/CartProvider'
 import Navbar from './components/Navbar'
+import ScrollToTop from './components/ScrollToTop'
 import ItemListContainer from './components/ItemListContainer'
 import ItemDetailContainer from './components/ItemDetailContainer'
+import Cart from './components/Cart'
+import NotFound from './components/NotFound'
 
 function App() {
-  // Navegación PROVISORIA: guarda el id del producto que se está viendo (null = catálogo).
-  // Cuando se incorpore React Router (Módulo 5), el id vendrá de la URL y este estado desaparece.
-  const [productoId, setProductoId] = useState(null)
-
   return (
-    <>
+    <CartProvider>
+      <ScrollToTop />
       <Navbar />
-      {productoId === null ? (
-        <ItemListContainer greeting="¡Bienvenidos a Lila del Alba!" onVerDetalle={setProductoId} />
-      ) : (
-        <ItemDetailContainer productId={productoId} onVolver={() => setProductoId(null)} />
-      )}
-    </>
+      <Routes>
+        <Route path="/" element={<ItemListContainer greeting="¡Bienvenidos a Lila del Alba!" />} />
+        <Route path="/category/:categoryId" element={<ItemListContainer />} />
+        <Route path="/item/:id" element={<ItemDetailContainer />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </CartProvider>
   )
 }
 

@@ -1,0 +1,138 @@
+.cart {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+
+.cart--vacio {
+  text-align: center;
+}
+
+.cart__titulo {
+  margin: 0 0 1.5rem;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
+  color: var(--color-violeta);
+}
+
+.cart__enlace {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.7rem 1.5rem;
+  border-radius: 999px;
+  background-color: var(--color-violeta);
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+.cart__enlace:hover {
+  background-color: var(--color-violeta-oscuro);
+}
+
+.cart__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.cart__item {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  border: 1px solid var(--color-lavanda);
+  border-radius: 16px;
+  background-color: #fff;
+}
+
+.cart__imagen {
+  width: 72px;
+  height: 72px;
+  border-radius: 12px;
+  object-fit: cover;
+  background-color: var(--color-lavanda);
+}
+
+.cart__nombre {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-violeta-oscuro);
+  text-decoration: none;
+}
+
+.cart__nombre:hover {
+  text-decoration: underline;
+}
+
+.cart__detalle {
+  margin: 0.25rem 0 0;
+  font-size: 0.9rem;
+}
+
+.cart__subtotal {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-violeta);
+}
+
+.cart__quitar,
+.cart__vaciar {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-violeta);
+  border-radius: 999px;
+  background-color: transparent;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-violeta);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.cart__quitar:hover,
+.cart__vaciar:hover {
+  background-color: var(--color-violeta);
+  color: #fff;
+}
+
+.cart__quitar:focus-visible,
+.cart__vaciar:focus-visible,
+.cart__enlace:focus-visible,
+.cart__nombre:focus-visible {
+  outline: 3px solid var(--color-lila);
+  outline-offset: 2px;
+}
+
+.cart__resumen {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--color-lavanda);
+}
+
+.cart__total {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--color-violeta-oscuro);
+}
+
+/* En pantallas chicas el precio y el botón pasan debajo del nombre */
+@media (max-width: 560px) {
+  .cart__item {
+    grid-template-columns: 72px minmax(0, 1fr);
+  }
+
+  .cart__subtotal,
+  .cart__quitar {
+    grid-column: 2;
+    justify-self: start;
+  }
+}

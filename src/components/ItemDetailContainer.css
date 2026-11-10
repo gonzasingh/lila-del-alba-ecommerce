@@ -5,6 +5,7 @@
 }
 
 .item-detail-container__volver {
+  display: inline-block;
   margin: 0 0 1.5rem;
   padding: 0.5rem 0.25rem;
   border: none;
@@ -12,6 +13,7 @@
   font-size: 1rem;
   font-weight: 600;
   color: var(--color-violeta);
+  text-decoration: none;
   cursor: pointer;
 }
 

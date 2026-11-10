@@ -9,11 +9,16 @@ const RETARDO_DETALLE_MS = 1000
 
 // Devuelve una Promise que se resuelve con el array de productos
 // después de RETARDO_LISTADO_MS, como si se estuviera esperando la respuesta de un servidor.
-export const getProducts = () => {
+// Si recibe un categoryId, solo devuelve los productos de esa categoría.
+export const getProducts = (categoryId) => {
   return new Promise((resolve) => {
     setTimeout(() => {
+      const lista = categoryId
+        ? products.filter((product) => product.category === categoryId)
+        : products
+
       // Se entrega una copia para que quien consuma los datos no pueda modificar el original
-      resolve([...products])
+      resolve([...lista])
     }, RETARDO_LISTADO_MS)
   })
 }

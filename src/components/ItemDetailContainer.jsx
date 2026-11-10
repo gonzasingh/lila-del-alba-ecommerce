@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react'
+import { Link, useParams } from 'react-router-dom'
 import { getProductById } from '../mock/asyncMock'
+import { useCart } from '../hooks/useCart'
 import ItemDetail from './ItemDetail'
 import Cargando from './Cargando'
 import './ItemDetailContainer.css'
 
-// productId: id del producto a mostrar. Por ahora lo define App de forma temporal;
-// con React Router (Módulo 5) vendrá de la URL.
-// onVolver (opcional): se ejecuta al tocar "Volver al catálogo".
-function ItemDetailContainer({ productId, onVolver }) {
+// Se usa en la ruta "/item/:id": el id del producto viene de la URL
+function ItemDetailContainer() {
+  const { id: productId } = useParams()
+  const { addItem, getQuantity } = useCart()
+
   const [product, setProduct] = useState(null)
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState(false)
@@ -41,13 +44,14 @@ function ItemDetailContainer({ productId, onVolver }) {
     }
   }, [productId])
 
+  // Al confirmar en ItemCount, el producto se agrega al carrito con la cantidad elegida
+  const handleAdd = (cantidad) => addItem(product, cantidad)
+
   return (
     <main className="item-detail-container">
-      {onVolver && (
-        <button type="button" className="item-detail-container__volver" onClick={onVolver}>
-          ← Volver al catálogo
-        </button>
-      )}
+      <Link className="item-detail-container__volver" to="/">
+        ← Volver al catálogo
+      </Link>
 
       {cargando && <Cargando mensaje="Cargando producto..." />}
 
@@ -57,7 +61,13 @@ function ItemDetailContainer({ productId, onVolver }) {
         </p>
       )}
 
-      {product && <ItemDetail product={product} />}
+      {product && (
+        <ItemDetail
+          product={product}
+          cantidadEnCarrito={getQuantity(product.id)}
+          onAdd={handleAdd}
+        />
+      )}
     </main>
   )
 }
