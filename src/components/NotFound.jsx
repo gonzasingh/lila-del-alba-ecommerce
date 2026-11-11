@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import './NotFound.css'
 
-// Se muestra cuando la ruta (o la categoría) no existe
+// Se muestra cuando la ruta (o la categoría) no existe o se tipea mal :)
 function NotFound({ mensaje = 'La página que buscás no existe.' }) {
   return (
     <main className="not-found">

@@ -7,7 +7,7 @@ import { products } from './products'
 const RETARDO_LISTADO_MS = 2000
 const RETARDO_DETALLE_MS = 1000
 
-// Devuelve una Promise que se resuelve con el array de productos
+// Devuelve una Promise que se resuelve con el array de productos, no recomiendan hardcodear los datos, pero para este ejemplo está bien. Se resuelve
 // después de RETARDO_LISTADO_MS, como si se estuviera esperando la respuesta de un servidor.
 // Si recibe un categoryId, solo devuelve los productos de esa categoría.
 export const getProducts = (categoryId) => {
