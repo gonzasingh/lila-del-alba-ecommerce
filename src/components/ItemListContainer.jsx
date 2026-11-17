@@ -7,10 +7,10 @@ import Cargando from './Cargando'
 import NotFound from './NotFound'
 import './ItemListContainer.css'
 
-// Se usa en dos rutas: "/" (todo el catálogo) y "/category/:categoryId" (una categoría)
+// Se usa en dos rutas: "/" (todo el catálogo) y "/category/:id" (una categoría)
 function ItemListContainer({ greeting }) {
-  // categoryId viene de la URL: es undefined en "/"
-  const { categoryId } = useParams()
+  // El :id de la URL es la categoría (queda undefined en "/")
+  const { id: categoryId } = useParams()
   const categoriaValida = !categoryId || CATEGORIAS.some((categoria) => categoria.id === categoryId)
 
   // Productos obtenidos de la "API". Arranca como un array vacío

@@ -1,0 +1,11 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Cada página es un <main>: ocupa el espacio libre para que el footer quede al final de la pantalla */
+.layout > main {
+  flex: 1;
+  width: 100%;
+}

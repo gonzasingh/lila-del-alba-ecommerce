@@ -8,7 +8,7 @@ shampoo y acondicionador sólidos, difusores ambientales, spray textil y velas d
 
 El proyecto avanza por etapas. Hasta ahora tiene la estructura base, el **listado dinámico de productos**
 (con filtro por categoría), la **vista de detalle de cada producto**, la **navegación con React Router**
-y un **carrito de compras** conectado al contador de cantidad. Los datos se cargan de forma asíncrona
+(rutas anidadas con un layout compartido) y un **carrito de compras** conectado al contador de cantidad. Los datos se cargan de forma asíncrona
 desde una API simulada. En las próximas entregas se irán sumando el checkout y la conexión con Firebase.
 
 ## Tecnologías utilizadas
@@ -44,17 +44,38 @@ Luego abrir en el navegador la dirección que indica la terminal (por defecto `h
 
 ## Rutas
 
-La navegación usa React Router (`BrowserRouter` en `main.jsx` y las rutas definidas en `App.jsx`):
+La navegación usa React Router. `BrowserRouter` envuelve la aplicación en `App.jsx`, y las rutas están **anidadas**:
+una ruta padre sin `path` renderiza el `Layout` (Navbar + Footer) y todas las demás se dibujan dentro de su `<Outlet />`.
+Así el Navbar, el `CartWidget` y el Footer están presentes en todas las páginas, incluso en el error 404.
+
+```jsx
+<BrowserRouter>
+  <CartProvider>
+    <Routes>
+      <Route element={<Layout />}>
+        <Route index element={<ItemListContainer greeting="..." />} />
+        <Route path="/category/:id" element={<ItemListContainer />} />
+        <Route path="/item/:id" element={<ItemDetailContainer />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="*" element={<NotFound />} />
+      </Route>
+    </Routes>
+  </CartProvider>
+</BrowserRouter>
+```
 
 | Ruta | Muestra |
 |------|---------|
 | `/` | Catálogo completo (`ItemListContainer`) |
-| `/category/:categoryId` | Catálogo filtrado por categoría (`ItemListContainer`). Si la categoría no existe, muestra `NotFound`. |
-| `/item/:id` | Detalle de un producto (`ItemDetailContainer`) |
+| `/category/:id` | Catálogo filtrado por la categoría de la URL (`ItemListContainer`). Si la categoría no existe, muestra `NotFound`. |
+| `/item/:id` | Detalle del producto cuyo id está en la URL (`ItemDetailContainer`) |
 | `/cart` | Carrito de compras (`Cart`) |
-| `*` | Página no encontrada (`NotFound`) |
+| `*` | Error 404: página no encontrada (`NotFound`) |
 
-El logo y las categorías de la `Navbar` son links (`Link` / `NavLink`); la categoría que se está viendo queda resaltada.
+- **Links sin recargas:** toda la navegación interna usa `Link` / `NavLink` (nunca `<a>`), así que la página no se recarga y el estado de React se conserva.
+- **Sincronía de datos:** `ItemListContainer` lee el `:id` con `useParams` y lo incluye en el array de dependencias de su `useEffect`,
+  por lo que el listado se vuelve a filtrar solo cuando cambia la URL (por ejemplo, al elegir otra categoría o con el botón "atrás" del navegador).
+- **Sin ids "a mano":** hay una única ruta `/item/:id` para todos los productos; `ItemDetailContainer` toma el id de la URL y busca los datos.
 
 ## Componentes
 
@@ -62,15 +83,17 @@ Todos los componentes viven en `src/components`, cada uno con su archivo `.jsx` 
 
 | Componente | Descripción |
 |------------|-------------|
+| `Layout` | Estructura compartida por todas las rutas: `Navbar`, `Footer` y un `<Outlet />` donde se dibuja la página de la ruta actual. También incluye `ScrollToTop`. |
 | `Navbar` | Barra de navegación fija en la parte superior. Muestra el logo, las categorías de productos (generadas con `map` a partir de `src/mock/categories.js`) como `NavLink` a `/category/:categoryId`, y el `CartWidget`. |
 | `CartWidget` | Link al carrito con el ícono y la cantidad total de unidades, que lee del carrito con el hook `useCart`. |
-| `ItemListContainer` | Contenedor del catálogo. Lee `categoryId` de la URL, obtiene los productos con `getProducts(categoryId)` dentro de un `useEffect`, los guarda en el estado `items` y se los pasa por props a `ItemList`. Maneja los estados de carga y de error. No hace el `.map()`. |
+| `ItemListContainer` | Contenedor del catálogo. Lee el `id` de la URL (`/category/:id`), obtiene los productos con `getProducts(categoryId)` dentro de un `useEffect`, los guarda en el estado `items` y se los pasa por props a `ItemList`. Maneja los estados de carga y de error. No hace el `.map()`. |
 | `ItemList` | Recibe los productos por props (`items`), los recorre con `.map()` y renderiza un `Item` por cada uno, usando el `id` del producto como `key`. |
 | `Item` | Card con la información **resumida** de un producto (imagen, categoría, nombre y precio) y un link "Ver detalle" a `/item/:id`. |
-| `ItemDetailContainer` | Contenedor del detalle. Lee el `id` de la URL, ejecuta `getProductById` dentro de un `useEffect`, guarda el producto en el estado `product` y se lo entrega por props a `ItemDetail`. También conecta el detalle con el carrito: le pasa la cantidad que ya hay en el carrito y la función para agregar. No contiene el diseño del producto. |
+| `ItemDetailContainer` | Contenedor del detalle. Lee el `id` de la URL (`/item/:id`), ejecuta `getProductById` dentro de un `useEffect`, guarda el producto en el estado `product` y se lo entrega por props a `ItemDetail`. También conecta el detalle con el carrito: le pasa la cantidad que ya hay en el carrito y la función para agregar. No contiene el diseño del producto. |
 | `ItemDetail` | Presentación del detalle completo: imagen, categoría, nombre, precio, descripción, stock y la información que no aparece en la card (presentación, envase, características, aromas y precio por pack x10). Incluye el `ItemCount`. No busca datos ni conoce el carrito. |
 | `ItemCount` | Contador de cantidad reutilizable. Recibe el `stock` por props: no permite superarlo ni bajar de cero. El botón "Agregar al carrito" informa la cantidad elegida a través de la prop `onAdd`. |
 | `Cart` | Vista del carrito: lista los productos agregados con su subtotal, permite quitarlos o vaciar el carrito y muestra el total. |
+| `Footer` | Pie de página con el logo, las categorías y links a la tienda y al carrito (con `Link`). Se muestra en todas las rutas gracias al `Layout`. |
 | `NotFound` | Mensaje para rutas o categorías inexistentes, con un link al catálogo. |
 | `Cargando` | Indicador de carga que comparten los contenedores. |
 | `ScrollToTop` | Vuelve al inicio de la página cada vez que cambia la ruta. |
@@ -169,12 +192,14 @@ src/
 │   ├── Cargando.jsx / .css
 │   ├── Cart.jsx / .css
 │   ├── CartWidget.jsx / .css
+│   ├── Footer.jsx / .css
 │   ├── Item.jsx / .css
 │   ├── ItemCount.jsx / .css
 │   ├── ItemDetail.jsx / .css
 │   ├── ItemDetailContainer.jsx / .css
 │   ├── ItemList.jsx / .css
 │   ├── ItemListContainer.jsx / .css
+│   ├── Layout.jsx / .css
 │   ├── Navbar.jsx / .css
 │   ├── NotFound.jsx / .css
 │   └── ScrollToTop.jsx
@@ -189,7 +214,7 @@ src/
 │   └── products.js       # catálogo de productos
 ├── utils/
 │   └── formatearPrecio.js
-├── App.jsx               # definición de las rutas
+├── App.jsx               # BrowserRouter, CartProvider y definición de las rutas
 ├── index.css
-└── main.jsx              # BrowserRouter
+└── main.jsx              # punto de entrada
 ```

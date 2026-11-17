@@ -1,0 +1,83 @@
+.footer {
+  margin-top: 2rem;
+  border-top: 1px solid var(--color-lavanda);
+  background-color: var(--color-crema);
+}
+
+.footer__contenido {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 1.5rem;
+}
+
+.footer__logo-nombre {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.footer__logo {
+  height: 36px;
+  width: auto;
+}
+
+.footer__nombre {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-violeta);
+}
+
+.footer__lema {
+  margin: 0.75rem 0 0;
+  max-width: 32ch;
+  line-height: 1.5;
+}
+
+.footer__titulo {
+  margin: 0 0 0.75rem;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.05rem;
+  color: var(--color-violeta-oscuro);
+}
+
+.footer__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.footer__enlace {
+  color: var(--color-violeta);
+  font-size: 0.95rem;
+}
+
+.footer__enlace:hover {
+  text-decoration: underline;
+}
+
+.footer__enlace:focus-visible {
+  outline: 3px solid var(--color-lila);
+  outline-offset: 2px;
+}
+
+.footer__copy {
+  margin: 0;
+  padding: 1rem 1.5rem 1.5rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--color-violeta-oscuro);
+}
+
+@media (max-width: 700px) {
+  .footer__contenido {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .footer__marca {
+    grid-column: 1 / -1;
+  }
+}
