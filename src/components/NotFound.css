@@ -7,9 +7,9 @@
 
 .not-found__titulo {
   margin: 0 0 1rem;
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: var(--fuente-titulos);
   font-size: clamp(1.7rem, 5vw, 2.4rem);
-  color: var(--color-violeta);
+  color: var(--violeta);
 }
 
 .not-found__enlace {
@@ -17,18 +17,12 @@
   margin-top: 1rem;
   padding: 0.7rem 1.5rem;
   border-radius: 999px;
-  background-color: var(--color-violeta);
+  background-color: var(--violeta);
   font-weight: 700;
-  color: #fff;
-  text-decoration: none;
+  color: var(--blanco);
   transition: background-color 0.2s ease;
 }
 
 .not-found__enlace:hover {
-  background-color: var(--color-violeta-oscuro);
-}
-
-.not-found__enlace:focus-visible {
-  outline: 3px solid var(--color-lila);
-  outline-offset: 2px;
+  background-color: var(--noche);
 }

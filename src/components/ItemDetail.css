@@ -9,9 +9,9 @@
   width: 100%;
   aspect-ratio: 1 / 1;
   object-fit: cover;
-  border: 1px solid var(--color-lavanda);
-  border-radius: 20px;
-  background-color: var(--color-lavanda);
+  border: 1px solid var(--borde);
+  border-radius: 24px;
+  background-color: var(--bruma);
 }
 
 .item-detail__info {
@@ -22,17 +22,19 @@
 
 .item-detail__categoria {
   margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--color-violeta);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--violeta);
 }
 
 .item-detail__nombre {
   margin: -0.5rem 0 0;
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: var(--fuente-titulos);
   font-size: clamp(1.7rem, 4vw, 2.4rem);
   line-height: 1.15;
-  color: var(--color-violeta-oscuro);
+  color: var(--noche);
 }
 
 .item-detail__precios {
@@ -46,17 +48,17 @@
   margin: 0;
   font-size: 2rem;
   font-weight: 700;
-  color: var(--color-violeta);
+  color: var(--violeta);
 }
 
 .item-detail__pack {
   margin: 0;
   padding: 0.25rem 0.8rem;
   border-radius: 999px;
-  background-color: var(--color-crema);
+  background-color: var(--amanecer-suave);
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--color-violeta-oscuro);
+  color: var(--noche);
 }
 
 .item-detail__descripcion {
@@ -74,7 +76,7 @@
 
 .item-detail__ficha dt {
   font-weight: 700;
-  color: var(--color-violeta);
+  color: var(--violeta);
 }
 
 .item-detail__ficha dd {
@@ -83,9 +85,9 @@
 
 .item-detail__subtitulo {
   margin: 0 0 0.5rem;
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: var(--fuente-titulos);
   font-size: 1.15rem;
-  color: var(--color-violeta-oscuro);
+  color: var(--noche);
 }
 
 .item-detail__caracteristicas {
@@ -94,6 +96,10 @@
   gap: 0.3rem;
   padding-left: 1.2rem;
   list-style: disc;
+}
+
+.item-detail__caracteristicas li::marker {
+  color: var(--lila);
 }
 
 .item-detail__aromas {
@@ -105,39 +111,80 @@
 .item-detail__aromas li {
   padding: 0.25rem 0.8rem;
   border-radius: 999px;
-  background-color: var(--color-lavanda);
+  background-color: var(--lila-suave);
   font-size: 0.88rem;
-  color: var(--color-violeta-oscuro);
+  color: var(--violeta);
 }
 
 .item-detail__compra {
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
-  padding-top: 1.2rem;
-  border-top: 1px solid var(--color-lavanda);
+  gap: 0.9rem;
+  padding: 1.25rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background-color: var(--blanco);
 }
 
 .item-detail__stock {
   margin: 0;
   font-weight: 600;
-  color: var(--color-violeta-oscuro);
+  color: var(--texto-suave);
 }
 
 .item-detail__confirmacion {
   margin: 0;
-  color: var(--color-violeta);
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--violeta);
+}
+
+.item-detail__en-carrito {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--texto-suave);
 }
 
 .item-detail__enlace {
-  color: var(--color-violeta-oscuro);
+  font-weight: 700;
+  color: var(--violeta);
   text-decoration: underline;
 }
 
-.item-detail__enlace:focus-visible {
-  outline: 3px solid var(--color-lila);
-  outline-offset: 2px;
+/* Después de agregar: "Terminar mi compra" reemplaza al botón "Agregar al carrito" */
+.item-detail__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.item-detail__terminar,
+.item-detail__seguir {
+  display: inline-block;
+  padding: 0.8rem 1.6rem;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.item-detail__terminar {
+  background-color: var(--violeta);
+  color: var(--blanco);
+}
+
+.item-detail__terminar:hover {
+  background-color: var(--noche);
+}
+
+.item-detail__seguir {
+  border: 1.5px solid var(--violeta);
+  color: var(--violeta);
+}
+
+.item-detail__seguir:hover {
+  background-color: var(--violeta);
+  color: var(--blanco);
 }
 
 @media (min-width: 800px) {

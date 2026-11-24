@@ -1,12 +1,24 @@
 :root {
-  /* Paleta de Lila del Alba (tomada de la lista de precios de la marca) */
-  --color-lila: #b8a4fa;
-  --color-violeta: #6750a4;
-  --color-violeta-oscuro: #4a3877;
-  --color-fondo: #fef7ff;
-  --color-lavanda: #e5e0ef;
-  --color-crema: #fff7e3;
-  --color-texto: #3b2f4f;
+  /* ---- Identidad de marca: "Lila del Alba · sistema de marca, versión refinada" ---- */
+  --lila: #b7a4fb;
+  --violeta: #3b2b73;
+  --amanecer: #f7b58e;
+  --bruma: #f3efff;
+  --noche: #1c1535;
+
+  /* ---- Neutros y derivados de la paleta ---- */
+  --blanco: #fefefe;
+  --borde: #dcd9ea;
+  --lila-suave: color-mix(in srgb, var(--lila) 28%, white);
+  --amanecer-suave: color-mix(in srgb, var(--amanecer) 30%, white);
+  --texto: var(--noche);
+  --texto-suave: color-mix(in srgb, var(--noche) 72%, white);
+
+  /* ---- Tipografía, bordes y sombras ---- */
+  --fuente-titulos: Georgia, 'Times New Roman', serif;
+  --fuente-texto: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  --radio: 20px;
+  --sombra: 0 8px 24px rgba(59, 43, 115, 0.12);
 }
 
 * {
@@ -15,9 +27,9 @@
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
-  background-color: var(--color-fondo);
-  color: var(--color-texto);
+  font-family: var(--fuente-texto);
+  background-color: var(--bruma);
+  color: var(--texto);
 }
 
 a {
@@ -29,4 +41,24 @@ ul {
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+img {
+  max-width: 100%;
+}
+
+/* Foco visible para quien navega con teclado: violeta sobre fondos claros */
+:focus-visible {
+  outline: 3px solid var(--violeta);
+  outline-offset: 2px;
+}
+
+/* Quien prefiere menos movimiento no ve transiciones ni animaciones */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
 }

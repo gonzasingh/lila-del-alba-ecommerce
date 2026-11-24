@@ -1,138 +1,251 @@
 .cart {
-  max-width: 900px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 2.5rem 1.5rem 4rem;
 }
 
+.cart__titulo {
+  margin: 0 0 1.75rem;
+  font-family: var(--fuente-titulos);
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
+  color: var(--violeta);
+}
+
+/* ---------- Carrito vacío ---------- */
 .cart--vacio {
+  max-width: 600px;
+  padding-top: 3.5rem;
   text-align: center;
 }
 
-.cart__titulo {
+.cart__flor {
+  display: block;
+  width: 120px;
+  height: auto;
+  margin: 0 auto 1.25rem;
+}
+
+.cart__mensaje {
   margin: 0 0 1.5rem;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: clamp(1.8rem, 5vw, 2.6rem);
-  color: var(--color-violeta);
+  line-height: 1.6;
+  color: var(--texto-suave);
 }
 
-.cart__enlace {
+/* ---------- Botones (compartidos por el resumen y el carrito vacío) ---------- */
+.cart__boton {
   display: inline-block;
-  margin-top: 1rem;
-  padding: 0.7rem 1.5rem;
+  width: 100%;
+  padding: 0.8rem 1.5rem;
+  border: 1.5px solid var(--violeta);
   border-radius: 999px;
-  background-color: var(--color-violeta);
+  font-family: inherit;
+  font-size: 1rem;
   font-weight: 700;
-  color: #fff;
-  text-decoration: none;
-  transition: background-color 0.2s ease;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.cart__enlace:hover {
-  background-color: var(--color-violeta-oscuro);
+.cart--vacio .cart__boton {
+  width: auto;
+}
+
+.cart__boton--principal {
+  background-color: var(--violeta);
+  color: var(--blanco);
+}
+
+.cart__boton--principal:hover {
+  background-color: var(--noche);
+  border-color: var(--noche);
+}
+
+.cart__boton--secundario {
+  background-color: transparent;
+  color: var(--violeta);
+}
+
+.cart__boton--secundario:hover {
+  background-color: var(--violeta);
+  color: var(--blanco);
+}
+
+/* ---------- Carrito con productos ---------- */
+.cart__contenido {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
 }
 
 .cart__lista {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.9rem;
 }
 
 .cart__item {
   display: grid;
-  grid-template-columns: 72px minmax(0, 1fr) auto auto;
+  grid-template-columns: 88px minmax(0, 1fr) auto;
   align-items: center;
   gap: 1rem;
-  padding: 0.75rem;
-  border: 1px solid var(--color-lavanda);
-  border-radius: 16px;
-  background-color: #fff;
+  padding: 0.85rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background-color: var(--blanco);
 }
 
 .cart__imagen {
-  width: 72px;
-  height: 72px;
-  border-radius: 12px;
+  width: 88px;
+  height: 88px;
+  border-radius: 14px;
   object-fit: cover;
-  background-color: var(--color-lavanda);
+  background-color: var(--bruma);
 }
 
 .cart__nombre {
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 1.05rem;
+  font-family: var(--fuente-titulos);
+  font-size: 1.1rem;
   font-weight: 700;
-  color: var(--color-violeta-oscuro);
-  text-decoration: none;
+  line-height: 1.25;
+  color: var(--noche);
 }
 
 .cart__nombre:hover {
+  color: var(--violeta);
   text-decoration: underline;
 }
 
-.cart__detalle {
-  margin: 0.25rem 0 0;
-  font-size: 0.9rem;
-}
-
-.cart__subtotal {
-  margin: 0;
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--color-violeta);
-}
-
-.cart__quitar,
-.cart__vaciar {
-  padding: 0.5rem 1rem;
-  border: 1px solid var(--color-violeta);
-  border-radius: 999px;
-  background-color: transparent;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--color-violeta);
-  cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.cart__quitar:hover,
-.cart__vaciar:hover {
-  background-color: var(--color-violeta);
-  color: #fff;
-}
-
-.cart__quitar:focus-visible,
-.cart__vaciar:focus-visible,
-.cart__enlace:focus-visible,
-.cart__nombre:focus-visible {
-  outline: 3px solid var(--color-lila);
-  outline-offset: 2px;
-}
-
-.cart__resumen {
+/* Precio unitario, cantidad y subtotal, cada uno con su etiqueta */
+.cart__cifras {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-top: 1.5rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid var(--color-lavanda);
+  gap: 0.4rem 1.75rem;
+  margin: 0.6rem 0 0;
+}
+
+.cart__cifras dt {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--texto-suave);
+}
+
+.cart__cifras dd {
+  margin: 0.1rem 0 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.cart__cifras .cart__subtotal {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--violeta);
+}
+
+.cart__eliminar {
+  padding: 0.5rem 1rem;
+  border: 1.5px solid var(--borde);
+  border-radius: 999px;
+  background-color: transparent;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--violeta);
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.cart__eliminar:hover {
+  border-color: var(--violeta);
+  background-color: var(--bruma);
+}
+
+/* ---------- Resumen y total ---------- */
+.cart__resumen {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1.4rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background-color: var(--blanco);
+}
+
+.cart__resumen-titulo {
+  margin: 0;
+  font-family: var(--fuente-titulos);
+  font-size: 1.3rem;
+  color: var(--noche);
+}
+
+.cart__resumen-fila {
+  margin: 0;
+  color: var(--texto-suave);
 }
 
 .cart__total {
-  margin: 0;
-  font-size: 1.2rem;
-  color: var(--color-violeta-oscuro);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0.25rem 0 0.5rem;
+  padding: 1rem 0;
+  border-top: 1px solid var(--borde);
+  border-bottom: 1px solid var(--borde);
+  font-size: 1.1rem;
 }
 
-/* En pantallas chicas el precio y el botón pasan debajo del nombre */
+.cart__total strong {
+  font-size: 1.6rem;
+  color: var(--violeta);
+}
+
+.cart__aviso {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 14px;
+  background-color: var(--amanecer-suave);
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: var(--noche);
+}
+
+.cart__seguir {
+  align-self: center;
+  margin-top: 0.25rem;
+  font-weight: 600;
+  color: var(--violeta);
+  text-decoration: underline;
+}
+
+@media (min-width: 900px) {
+  .cart__contenido {
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 2rem;
+  }
+
+  /* El resumen acompaña al scroll mientras se revisa la lista */
+  .cart__resumen {
+    position: sticky;
+    top: 96px;
+  }
+}
+
+/* En pantallas chicas el botón "Eliminar" pasa debajo de los datos */
 @media (max-width: 560px) {
   .cart__item {
     grid-template-columns: 72px minmax(0, 1fr);
   }
 
-  .cart__subtotal,
-  .cart__quitar {
-    grid-column: 2;
+  .cart__imagen {
+    width: 72px;
+    height: 72px;
+  }
+
+  .cart__eliminar {
+    grid-column: 1 / -1;
     justify-self: start;
   }
 }

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { getProductById } from '../mock/asyncMock'
-import { useCart } from '../hooks/useCart'
 import ItemDetail from './ItemDetail'
 import Cargando from './Cargando'
 import './ItemDetailContainer.css'
@@ -9,7 +8,6 @@ import './ItemDetailContainer.css'
 // Se usa en la ruta "/item/:id": el id del producto viene de la URL
 function ItemDetailContainer() {
   const { id: productId } = useParams()
-  const { addItem, getQuantity } = useCart()
 
   const [product, setProduct] = useState(null)
   const [cargando, setCargando] = useState(true)
@@ -44,9 +42,6 @@ function ItemDetailContainer() {
     }
   }, [productId])
 
-  // Al confirmar en ItemCount, el producto se agrega al carrito con la cantidad elegida
-  const handleAdd = (cantidad) => addItem(product, cantidad)
-
   return (
     <main className="item-detail-container">
       <Link className="item-detail-container__volver" to="/">
@@ -61,13 +56,7 @@ function ItemDetailContainer() {
         </p>
       )}
 
-      {product && (
-        <ItemDetail
-          product={product}
-          cantidadEnCarrito={getQuantity(product.id)}
-          onAdd={handleAdd}
-        />
-      )}
+      {product && <ItemDetail product={product} />}
     </main>
   )
 }

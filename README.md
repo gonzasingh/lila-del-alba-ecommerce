@@ -8,8 +8,9 @@ shampoo y acondicionador sólidos, difusores ambientales, spray textil y velas d
 
 El proyecto avanza por etapas. Hasta ahora tiene la estructura base, el **listado dinámico de productos**
 (con filtro por categoría), la **vista de detalle de cada producto**, la **navegación con React Router**
-(rutas anidadas con un layout compartido) y un **carrito de compras** conectado al contador de cantidad. Los datos se cargan de forma asíncrona
-desde una API simulada. En las próximas entregas se irán sumando el checkout y la conexión con Firebase.
+(rutas anidadas con un layout compartido) y un **carrito de compras funcional** basado en Context API: se agrega desde el detalle,
+se ve en el `CartWidget` del Navbar y en la página `/cart`, donde se puede quitar cada producto, vaciar todo y ver el total. Los datos se cargan de forma asíncrona
+desde una API simulada. La interfaz sigue la **identidad visual refinada** de la marca (ver "Identidad visual"). En las próximas entregas se irán sumando el checkout y la conexión con Firebase.
 
 ## Tecnologías utilizadas
 
@@ -84,16 +85,16 @@ Todos los componentes viven en `src/components`, cada uno con su archivo `.jsx` 
 | Componente | Descripción |
 |------------|-------------|
 | `Layout` | Estructura compartida por todas las rutas: `Navbar`, `Footer` y un `<Outlet />` donde se dibuja la página de la ruta actual. También incluye `ScrollToTop`. |
-| `Navbar` | Barra de navegación fija en la parte superior. Muestra el logo, las categorías de productos (generadas con `map` a partir de `src/mock/categories.js`) como `NavLink` a `/category/:categoryId`, y el `CartWidget`. |
-| `CartWidget` | Link al carrito con el ícono y la cantidad total de unidades, que lee del carrito con el hook `useCart`. |
+| `Navbar` | Barra de navegación fija en la parte superior. Muestra el logo horizontal de la marca, las categorías de productos (generadas con `map` a partir de `src/mock/categories.js`) como `NavLink` a `/category/:categoryId`, y el `CartWidget`. |
+| `CartWidget` | Link a `/cart` con el ícono y un círculo con la cantidad total de unidades (`totalItems`, que lee del contexto con `useCart`). Con el carrito vacío no muestra el número. |
 | `ItemListContainer` | Contenedor del catálogo. Lee el `id` de la URL (`/category/:id`), obtiene los productos con `getProducts(categoryId)` dentro de un `useEffect`, los guarda en el estado `items` y se los pasa por props a `ItemList`. Maneja los estados de carga y de error. No hace el `.map()`. |
 | `ItemList` | Recibe los productos por props (`items`), los recorre con `.map()` y renderiza un `Item` por cada uno, usando el `id` del producto como `key`. |
 | `Item` | Card con la información **resumida** de un producto (imagen, categoría, nombre y precio) y un link "Ver detalle" a `/item/:id`. |
-| `ItemDetailContainer` | Contenedor del detalle. Lee el `id` de la URL (`/item/:id`), ejecuta `getProductById` dentro de un `useEffect`, guarda el producto en el estado `product` y se lo entrega por props a `ItemDetail`. También conecta el detalle con el carrito: le pasa la cantidad que ya hay en el carrito y la función para agregar. No contiene el diseño del producto. |
-| `ItemDetail` | Presentación del detalle completo: imagen, categoría, nombre, precio, descripción, stock y la información que no aparece en la card (presentación, envase, características, aromas y precio por pack x10). Incluye el `ItemCount`. No busca datos ni conoce el carrito. |
+| `ItemDetailContainer` | Contenedor del detalle. Lee el `id` de la URL (`/item/:id`), ejecuta `getProductById` dentro de un `useEffect`, guarda el producto en el estado `product` y se lo entrega por props a `ItemDetail`. No contiene el diseño del producto ni toca el carrito. |
+| `ItemDetail` | Presentación del detalle completo: imagen, categoría, nombre, precio, descripción, stock y la información que no aparece en la card (presentación, envase, características, aromas y precio por pack x10). **Consume el contexto** (`useCart`): al confirmar una cantidad en `ItemCount` llama a `addItem(product, quantity)` y, una vez agregado, reemplaza el contador por el botón **"Terminar mi compra"** (lleva a `/cart`) y un link "Seguir comprando". |
 | `ItemCount` | Contador de cantidad reutilizable. Recibe el `stock` por props: no permite superarlo ni bajar de cero. El botón "Agregar al carrito" informa la cantidad elegida a través de la prop `onAdd`. |
-| `Cart` | Vista del carrito: lista los productos agregados con su subtotal, permite quitarlos o vaciar el carrito y muestra el total. |
-| `Footer` | Pie de página con el logo, las categorías y links a la tienda y al carrito (con `Link`). Se muestra en todas las rutas gracias al `Layout`. |
+| `Cart` | Página del carrito (ruta `/cart`). Con el carrito vacío muestra un mensaje y un link para volver al catálogo. Con productos lista, de cada uno, nombre, cantidad, precio unitario y subtotal, con un botón "Eliminar" por producto; además muestra el **total**, el botón "Vaciar carrito" y un botón "Finalizar compra" que por ahora es un placeholder. |
+| `Footer` | Pie de página sobre fondo oscuro con la versión del logo para fondo oscuro, las categorías y links a la tienda y al carrito (con `Link`). Se muestra en todas las rutas gracias al `Layout`. |
 | `NotFound` | Mensaje para rutas o categorías inexistentes, con un link al catálogo. |
 | `Cargando` | Indicador de carga que comparten los contenedores. |
 | `ScrollToTop` | Vuelve al inicio de la página cada vez que cambia la ruta. |
@@ -152,8 +153,8 @@ export const getProductById = (productId) => {
 
 ```
 getProductById       →  busca el producto por id y devuelve una promesa
-ItemDetailContainer  →  ejecuta la promesa, administra el estado y conecta con el carrito
-   └─ ItemDetail     →  muestra la información completa
+ItemDetailContainer  →  ejecuta la promesa y administra el estado (carga, error, producto)
+   └─ ItemDetail     →  muestra la información completa y agrega al carrito con useCart()
         └─ ItemCount →  controla la cantidad seleccionada (recibe el stock que todavía queda disponible)
 ```
 
@@ -162,32 +163,72 @@ ItemDetailContainer  →  ejecuta la promesa, administra el estado y conecta con
 
 ## Carrito
 
-El estado del carrito se comparte con toda la aplicación mediante Context API:
+El estado del carrito se comparte con toda la aplicación mediante Context API. Todo vive en `src/context/CartContext.jsx`, que exporta:
 
-- `src/context/CartContext.js`: crea el contexto.
-- `src/context/CartProvider.jsx`: guarda el carrito en un `useState` y expone `addItem`, `removeItem`, `clearCart`, `getQuantity`,
-  `totalQuantity` y `totalPrice`. Si un producto ya está en el carrito, suma la cantidad sin superar su stock.
-- `src/hooks/useCart.js`: custom hook para usar el contexto desde cualquier componente.
+- `CartContext`: el contexto (`createContext`).
+- `CartProvider`: componente que guarda el carrito (un array) en un `useState` y expone el valor del contexto. Envuelve todas las rutas en `App.jsx`,
+  por eso el carrito **no se pierde al navegar** entre páginas.
+- `useCart()`: custom hook (`useContext`) para usar el carrito desde cualquier componente; avisa si se usa fuera del `CartProvider`.
 
-Al tocar "Agregar al carrito", `ItemDetailContainer` llama a `addItem`. `ItemCount` recibe como stock lo que **todavía queda disponible**
-(stock menos lo que ya está en el carrito), por lo que nunca se puede agregar más que el stock total. El carrito vive en memoria:
-se vacía al recargar la página.
+| Valor del contexto | Qué hace |
+|--------------------|----------|
+| `cart` | Array de productos agregados: `{ id, name, price, img, category, stock, quantity }`. |
+| `addItem(item, quantity)` | Agrega un producto. Si ya está en el carrito (se compara por `id`) **no lo duplica**: suma la cantidad nueva a la existente (sin superar el stock). |
+| `removeItem(itemId)` | Elimina un producto del carrito por su id. |
+| `clear()` | Vacía el carrito por completo. |
+| `isInCart(id)` | Devuelve un booleano: `true` si el producto ya está en el carrito. |
+| `getQuantity(id)` | Cantidad de ese producto que hay en el carrito (0 si no está). |
+| `totalItems` | Suma de las cantidades de todos los productos (es el número del `CartWidget`). |
+| `totalPrice` | Precio total de la compra. |
+
+**Inmutabilidad:** todas las actualizaciones crean copias y nunca modifican el array original: `addItem` usa `.map()` para sumar la cantidad
+a un item existente y `[...prev, nuevo]` para agregar uno nuevo; `removeItem` usa `.filter()`; `clear` reemplaza el estado por un array nuevo.
+`totalItems` y `totalPrice` se calculan con `.reduce()` a partir del carrito, no se guardan aparte.
+
+**Flujo de compra:** en el detalle, `ItemCount` recibe como stock lo que **todavía queda disponible** (stock menos lo que ya está en el carrito),
+así que nunca se puede agregar más que el stock total. Al tocar "Agregar al carrito", `ItemDetail` llama a `addItem` y muestra "Terminar mi compra", que
+lleva a `/cart`. Ahí el cliente ve cada producto con su cantidad, precio unitario y subtotal, puede eliminarlos de a uno o vaciar el carrito, y ve el total
+antes de decidir. "Finalizar compra" es un placeholder: la orden de compra se genera en el módulo de Firebase. El carrito vive en memoria,
+por lo que se vacía al recargar la página.
+
+## Identidad visual
+
+El diseño sigue el documento *Lila del Alba — Identidad mejorada* (sistema de marca, versión refinada):
+
+| Color | Hex | Uso |
+|-------|-----|-----|
+| Lila | `#B7A4FB` | Detalles, bordes del contador, íconos |
+| Violeta | `#3B2B73` | Títulos, precios, botones principales y categoría activa |
+| Amanecer | `#F7B58E` | Acentos: contador del carrito, trazo bajo el título, etiquetas |
+| Bruma | `#F3EFFF` | Fondo de la página y de las imágenes |
+| Noche | `#1C1535` | Texto, pie de página y estado "hover" de los botones |
+
+- Los colores están definidos como variables CSS en `src/index.css` (`--lila`, `--violeta`, `--amanecer`, `--bruma`, `--noche`), junto con la tipografía, el radio de los bordes y la sombra.
+- **Logos** (en `src/assets`, extraídos del SVG de la marca): `logo-horizontal.svg` (cabecera web), `logo-horizontal-oscuro.svg` (sobre fondo oscuro, usado en el pie de página) y `logo-flor.svg` (isotipo, usado en el carrito vacío).
+- **Íconos** (en `public`): `favicon.svg` y `favicon.png` (ícono de app) y `apple-touch-icon.png`.
+- El texto del logo está convertido a trazados, así que la tipografía de la interfaz usa fuentes del sistema (Georgia para los títulos).
 
 ## Datos y fotos
 
 - Los precios, el precio por pack x10, los envases y los aromas salen de la lista de precios y de la lista de fragancias de la marca.
 - El **stock es de ejemplo**: se reemplazará por los valores reales cuando los datos vengan de Firebase.
-- Las fotos de `public/productos` (`.jpg`) son del material de la marca. Los productos que todavía no tienen foto
-  (bálsamo en envase plástico, acondicionador sólido, body splash, difusor para auto y vela de soja) usan una ilustración provisoria (`.svg`).
+- Las fotos de `public/productos` son las del sitio de la marca ([liladelalba.vercel.app](https://liladelalba.vercel.app/)). Los productos que ahí
+  no tienen una foto propia comparten la de su categoría, igual que en el sitio: cremas (`cremas.webp`), aceites (`aceites.webp`),
+  shampoo sólido (`shampoo-solido.webp`) y hogar (`hogar.webp`, para el difusor de 60 ml, el difusor para auto y el spray textil).
+  Los dos jabones sin aroma (con y sin arcilla) usan la misma foto, como en el sitio.
 
 ## Estructura del proyecto
 
 ```
 public/
-└── productos/            # fotos (.jpg) e ilustraciones provisorias (.svg) de los productos
+├── productos/            # fotos de los productos (.jpg / .webp)
+├── favicon.svg / .png    # ícono de la marca
+└── apple-touch-icon.png
 src/
 ├── assets/
-│   └── logo-flor.png
+│   ├── logo-horizontal.svg
+│   ├── logo-horizontal-oscuro.svg
+│   └── logo-flor.svg
 ├── components/
 │   ├── Cargando.jsx / .css
 │   ├── Cart.jsx / .css
@@ -204,10 +245,7 @@ src/
 │   ├── NotFound.jsx / .css
 │   └── ScrollToTop.jsx
 ├── context/
-│   ├── CartContext.js
-│   └── CartProvider.jsx
-├── hooks/
-│   └── useCart.js
+│   └── CartContext.jsx   # CartContext, CartProvider y el hook useCart
 ├── mock/
 │   ├── asyncMock.js      # getProducts y getProductById (Promises con retraso simulado)
 │   ├── categories.js     # categorías de la tienda

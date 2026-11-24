@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import CartProvider from './context/CartProvider'
+import { CartProvider } from './context/CartContext'
 import Layout from './components/Layout'
 import ItemListContainer from './components/ItemListContainer'
 import ItemDetailContainer from './components/ItemDetailContainer'
@@ -9,6 +9,7 @@ import NotFound from './components/NotFound'
 function App() {
   return (
     <BrowserRouter>
+      {/* El CartProvider envuelve todas las rutas: el carrito no se pierde al navegar */}
       <CartProvider>
         <Routes>
           {/* Rutas anidadas: todas se dibujan dentro del Layout (Navbar + Footer) */}

@@ -59,7 +59,7 @@ export const products = [
     price: 2000,
     priceX10: 1800,
     category: 'jabones',
-    img: '/productos/jabon-exfoliante.jpg',
+    img: '/productos/jabon-avena-carbon.jpg',
     stock: 40,
     description:
       'Jabón exfoliante con forma de masajeador, pensado para limpiar y estimular la piel durante la ducha. Se presenta sin aroma.',
@@ -71,7 +71,7 @@ export const products = [
     price: 2500,
     priceX10: 2300,
     category: 'jabones',
-    img: '/productos/jabon-exfoliante.jpg',
+    img: '/productos/jabon-avena-carbon.jpg',
     stock: 32,
     description:
       'Jabón exfoliante masajeador que suma arcilla a la base de avena o carbón activado. Se presenta sin aroma.',
@@ -83,7 +83,7 @@ export const products = [
     price: 3500,
     priceX10: 3300,
     category: 'jabones',
-    img: '/productos/jabon-exfoliante.jpg',
+    img: '/productos/jabon-avena-carbon-aroma.jpg',
     stock: 28,
     description:
       'Jabón exfoliante con forma de masajeador, con el aroma que elijas de nuestra colección de cuidado personal.',
@@ -96,7 +96,7 @@ export const products = [
     price: 4000,
     priceX10: 3800,
     category: 'jabones',
-    img: '/productos/jabon-exfoliante.jpg',
+    img: '/productos/jabon-avena-carbon-arcilla-aroma.jpg',
     stock: 5,
     description:
       'Nuestro jabón exfoliante más completo: base de avena o carbón activado, arcilla y el aroma que prefieras.',
@@ -115,7 +115,7 @@ export const products = [
     price: 4900,
     priceX10: 4700,
     category: 'cremas',
-    img: '/productos/crema-corporal.jpg',
+    img: '/productos/cremas.webp',
     stock: 18,
     description:
       'Crema corporal hidratante en formato chico, ideal para llevar en la cartera. Con el aroma que elijas.',
@@ -129,7 +129,7 @@ export const products = [
     price: 5100,
     priceX10: 4900,
     category: 'cremas',
-    img: '/productos/crema-corporal.jpg',
+    img: '/productos/cremas.webp',
     stock: 22,
     description:
       'Crema corporal hidratante en formato de uso diario. Con el aroma que elijas.',
@@ -145,7 +145,7 @@ export const products = [
     price: 8750,
     priceX10: 8550,
     category: 'aceites',
-    img: '/productos/aceite-corporal.jpg',
+    img: '/productos/aceites.webp',
     stock: 14,
     description:
       'Aceite corporal con almendras, karité, jojoba y vitamina E. Se presenta sin aroma.',
@@ -158,7 +158,7 @@ export const products = [
     price: 8950,
     priceX10: 8750,
     category: 'aceites',
-    img: '/productos/aceite-corporal.jpg',
+    img: '/productos/aceites.webp',
     stock: 12,
     description:
       'Aceite corporal con almendras, karité, jojoba y vitamina E, con el aroma que elijas.',
@@ -172,7 +172,7 @@ export const products = [
     price: 15100,
     priceX10: 14900,
     category: 'aceites',
-    img: '/productos/aceite-corporal.jpg',
+    img: '/productos/aceites.webp',
     stock: 9,
     description:
       'Aceite corporal con almendras, karité, jojoba y vitamina E en formato de 100 cc. Se presenta sin aroma.',
@@ -185,7 +185,7 @@ export const products = [
     price: 15480,
     priceX10: 15280,
     category: 'aceites',
-    img: '/productos/aceite-corporal.jpg',
+    img: '/productos/aceites.webp',
     stock: 3,
     description:
       'Aceite corporal con almendras, karité, jojoba y vitamina E en formato de 100 cc, con el aroma que elijas.',
@@ -201,7 +201,7 @@ export const products = [
     price: 6800,
     priceX10: 6600,
     category: 'serum',
-    img: '/productos/serum-hidratante.jpg',
+    img: '/productos/serum-30cc-plastico.jpg',
     stock: 16,
     description:
       'Sérum hidratante con ácido hialurónico y niacinamida, en envase plástico con válvula gota a gota.',
@@ -215,7 +215,7 @@ export const products = [
     price: 8000,
     priceX10: 7800,
     category: 'serum',
-    img: '/productos/serum-hidratante.jpg',
+    img: '/productos/serum-30cc-vidrio.jpg',
     stock: 11,
     description:
       'Sérum hidratante con ácido hialurónico y niacinamida, en envase de vidrio con gotero.',
@@ -231,7 +231,7 @@ export const products = [
     price: 3500,
     priceX10: 3300,
     category: 'balsamo',
-    img: '/productos/balsamo.svg',
+    img: '/productos/balsamo-labial-5cc.jpg',
     stock: 36,
     description: 'Bálsamo labial en envase plástico, práctico para llevar siempre encima.',
     presentation: '5 cc',
@@ -244,7 +244,7 @@ export const products = [
     price: 3700,
     priceX10: 3500,
     category: 'balsamo',
-    img: '/productos/balsamo-lata.jpg',
+    img: '/productos/balsamo-labial-10cc.jpg',
     stock: 25,
     description: 'Bálsamo labial en lata metálica, con más contenido para uso frecuente.',
     presentation: '10 cc',
@@ -259,7 +259,7 @@ export const products = [
     price: 7500,
     priceX10: 7300,
     category: 'ducha',
-    img: '/productos/shampoo-solido.jpg',
+    img: '/productos/shampoo-solido.webp',
     stock: 20,
     description:
       'Shampoo en barra, sin envase plástico. Disponible para la caída de cabello, para cabello seco o para cabello graso.',
@@ -272,7 +272,7 @@ export const products = [
     price: 7500,
     priceX10: 7300,
     category: 'ducha',
-    img: '/productos/ducha.svg',
+    img: '/productos/acondicionador-solido.jpg',
     stock: 2,
     description:
       'Acondicionador en barra, humectante y sin TACC. Complementa al shampoo sólido en la rutina de ducha.',
@@ -285,7 +285,7 @@ export const products = [
     price: 8000,
     priceX10: 7800,
     category: 'ducha',
-    img: '/productos/bodysplash.svg',
+    img: '/productos/body-splash.jpg',
     stock: 15,
     description:
       'Body splash para perfumar el cuerpo después de la ducha, con el aroma que elijas.',
@@ -299,7 +299,7 @@ export const products = [
     name: 'Difusor ambiental 60 ml',
     price: 3000,
     category: 'hogar',
-    img: '/productos/hogar-difusor-spray.jpg',
+    img: '/productos/hogar.webp',
     stock: 30,
     description:
       'Difusor con varillas para perfumar ambientes chicos, con el aroma que elijas.',
@@ -313,7 +313,7 @@ export const products = [
     name: 'Difusor ambiental 125 ml',
     price: 5500,
     category: 'hogar',
-    img: '/productos/hogar-difusor-spray.jpg',
+    img: '/productos/difusor-125ml.jpg',
     stock: 21,
     description:
       'Difusor con varillas en formato de 125 ml, para perfumar ambientes por más tiempo.',
@@ -327,7 +327,7 @@ export const products = [
     name: 'Difusor ambiental 100 ml en vidrio',
     price: 7500,
     category: 'hogar',
-    img: '/productos/hogar-difusor-spray.jpg',
+    img: '/productos/difusor-100ml-vidrio.jpg',
     stock: 13,
     description:
       'Difusor con varillas en envase de vidrio, una opción más decorativa para el living o el dormitorio.',
@@ -341,7 +341,7 @@ export const products = [
     name: 'Difusor para auto 9 ml',
     price: 4800,
     category: 'hogar',
-    img: '/productos/difusor-auto.svg',
+    img: '/productos/hogar.webp',
     stock: 24,
     description: 'Difusor de 9 ml para perfumar el interior del auto, con el aroma que elijas.',
     presentation: '9 ml',
@@ -353,7 +353,7 @@ export const products = [
     name: 'Spray textil 250 ml',
     price: 6500,
     category: 'hogar',
-    img: '/productos/hogar-difusor-spray.jpg',
+    img: '/productos/hogar.webp',
     stock: 17,
     description:
       'Spray para perfumar telas, cortinas, almohadones y ropa de cama, con el aroma que elijas.',
@@ -366,7 +366,7 @@ export const products = [
     name: 'Vela de soja 90 gr',
     price: 6000,
     category: 'hogar',
-    img: '/productos/hogar.svg',
+    img: '/productos/vela-soja-90g.jpg',
     stock: 19,
     description: 'Vela de cera de soja en envase de metal, con el aroma que elijas.',
     presentation: '90 gr',

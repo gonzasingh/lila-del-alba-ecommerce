@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { CATEGORIAS } from '../mock/categories'
-import logoFlor from '../assets/logo-flor.png'
+import logoOscuro from '../assets/logo-horizontal-oscuro.svg'
 import './Footer.css'
 
 // Pie de página: se muestra en todas las rutas gracias al Layout.
@@ -12,10 +12,8 @@ function Footer() {
     <footer className="footer">
       <div className="footer__contenido">
         <div className="footer__marca">
-          <div className="footer__logo-nombre">
-            <img className="footer__logo" src={logoFlor} alt="" />
-            <span className="footer__nombre">Lila del Alba</span>
-          </div>
+          {/* Versión del logo para fondo oscuro */}
+          <img className="footer__logo" src={logoOscuro} alt="Lila del Alba" />
           <p className="footer__lema">Cosmética natural y aromatización.</p>
         </div>
 

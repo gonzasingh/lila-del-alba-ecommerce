@@ -1,16 +1,16 @@
 import { Link } from 'react-router-dom'
-import { useCart } from '../hooks/useCart'
+import { useCart } from '../context/CartContext'
 import './CartWidget.css'
 
 function CartWidget() {
-  // Cantidad total de unidades que hay en el carrito
-  const { totalQuantity } = useCart()
+  // Suma de las cantidades de todos los productos del carrito
+  const { totalItems } = useCart()
 
   return (
     <Link
       className="cart-widget"
       to="/cart"
-      aria-label={`Carrito de compras: ${totalQuantity} ${totalQuantity === 1 ? 'unidad' : 'unidades'}`}
+      aria-label={`Carrito de compras: ${totalItems} ${totalItems === 1 ? 'unidad' : 'unidades'}`}
     >
       <svg
         className="cart-widget__icono"
@@ -26,7 +26,8 @@ function CartWidget() {
         <circle cx="18" cy="20" r="1.5" />
         <path d="M2 3h3l2.7 12.4a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.8L20 7H6" />
       </svg>
-      {totalQuantity > 0 && <span className="cart-widget__contador">{totalQuantity}</span>}
+      {/* Con el carrito vacío no se muestra el número */}
+      {totalItems > 0 && <span className="cart-widget__contador">{totalItems}</span>}
     </Link>
   )
 }

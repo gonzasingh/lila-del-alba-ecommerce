@@ -5,17 +5,28 @@
 }
 
 .item-list-container__saludo {
-  margin: 0 0 2.5rem;
+  margin: 0 0 2.75rem;
   text-align: center;
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: var(--fuente-titulos);
   font-size: clamp(1.8rem, 5vw, 3rem);
   line-height: 1.2;
-  color: var(--color-violeta);
+  color: var(--violeta);
+}
+
+/* Trazo "amanecer" bajo el título: recuerda al arco del logo */
+.item-list-container__saludo::after {
+  content: '';
+  display: block;
+  width: 72px;
+  height: 5px;
+  margin: 0.9rem auto 0;
+  border-radius: 999px;
+  background-color: var(--amanecer);
 }
 
 .item-list-container__error {
   margin: 3rem 0;
   text-align: center;
   font-size: 1.05rem;
-  color: var(--color-violeta);
+  color: var(--violeta);
 }

@@ -1,15 +1,22 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import ItemCount from './ItemCount'
+import { useCart } from '../context/CartContext'
 import { getNombreCategoria } from '../mock/categories'
 import { formatearPrecio } from '../utils/formatearPrecio'
 import './ItemDetail.css'
 
 // ItemDetail recibe un producto por props y muestra TODA su información.
-// No busca datos ni toca el carrito: eso lo hace ItemDetailContainer, que le pasa
-//  - cantidadEnCarrito: cuántas unidades de este producto ya están en el carrito
-//  - onAdd: función a ejecutar cuando el cliente confirma una cantidad
-function ItemDetail({ product, cantidadEnCarrito = 0, onAdd }) {
+// No busca datos (eso lo hace ItemDetailContainer): lo único que toma del contexto
+// es el carrito, para agregar el producto con la cantidad que elija el cliente.
+function ItemDetail({ product }) {
+  const { addItem, getQuantity } = useCart()
+
+  // Cantidad que se acaba de agregar en esta visita (0 = todavía no agregó nada)
+  const [agregadas, setAgregadas] = useState(0)
+
   const {
+    id,
     name,
     price,
     priceX10,
@@ -24,10 +31,17 @@ function ItemDetail({ product, cantidadEnCarrito = 0, onAdd }) {
   } = product
 
   // Lo que todavía se puede agregar: el stock menos lo que ya está en el carrito
+  const cantidadEnCarrito = getQuantity(id)
   const disponible = stock - cantidadEnCarrito
 
   const textoStock =
     stock === 0 ? 'Sin stock' : `Stock disponible: ${stock} ${stock === 1 ? 'unidad' : 'unidades'}`
+
+  // El cliente confirma la cantidad en ItemCount: se agrega al carrito (contexto)
+  const handleAdd = (cantidad) => {
+    addItem(product, cantidad)
+    setAgregadas(cantidad)
+  }
 
   return (
     <article className="item-detail">
@@ -89,16 +103,43 @@ function ItemDetail({ product, cantidadEnCarrito = 0, onAdd }) {
 
         <div className="item-detail__compra">
           <p className="item-detail__stock">{textoStock}</p>
-          {/* Con key, el contador se reinicia después de cada "Agregar al carrito" */}
-          <ItemCount key={cantidadEnCarrito} stock={disponible} onAdd={onAdd} />
-          {cantidadEnCarrito > 0 && (
-            <p className="item-detail__confirmacion" role="status">
-              Tenés {cantidadEnCarrito} {cantidadEnCarrito === 1 ? 'unidad' : 'unidades'} de este
-              producto en el carrito.{' '}
-              <Link className="item-detail__enlace" to="/cart">
-                Ir al carrito
-              </Link>
-            </p>
+
+          {agregadas > 0 ? (
+            // Ya agregó: el botón "Agregar" se reemplaza por "Terminar mi compra" (lleva a /cart)
+            <>
+              <p className="item-detail__confirmacion" role="status">
+                ¡Listo! Agregaste {agregadas} {agregadas === 1 ? 'unidad' : 'unidades'} al carrito.
+              </p>
+              <div className="item-detail__acciones">
+                <Link className="item-detail__terminar" to="/cart">
+                  Terminar mi compra
+                </Link>
+                <Link className="item-detail__seguir" to="/">
+                  Seguir comprando
+                </Link>
+              </div>
+            </>
+          ) : (
+            <>
+              {disponible > 0 ? (
+                <ItemCount stock={disponible} onAdd={handleAdd} />
+              ) : (
+                stock > 0 && (
+                  <p className="item-detail__confirmacion">
+                    Ya tenés todo el stock disponible en tu carrito.
+                  </p>
+                )
+              )}
+              {cantidadEnCarrito > 0 && (
+                <p className="item-detail__en-carrito">
+                  Tenés {cantidadEnCarrito} {cantidadEnCarrito === 1 ? 'unidad' : 'unidades'} de
+                  este producto en el carrito.{' '}
+                  <Link className="item-detail__enlace" to="/cart">
+                    Terminar mi compra
+                  </Link>
+                </p>
+              )}
+            </>
           )}
         </div>
       </div>
