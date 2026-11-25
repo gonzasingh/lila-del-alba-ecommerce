@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { getProductById } from '../mock/asyncMock'
+import { getProductById } from '../services/products'
+import { getNombreCategoria } from '../mock/categories'
 import ItemDetail from './ItemDetail'
 import Cargando from './Cargando'
 import './ItemDetailContainer.css'
@@ -44,8 +45,12 @@ function ItemDetailContainer() {
 
   return (
     <main className="item-detail-container">
-      <Link className="item-detail-container__volver" to="/">
-        ← Volver al catálogo
+      {/* Vuelve a la categoría del producto (mientras carga todavía no se sabe cuál es) */}
+      <Link
+        className="item-detail-container__volver"
+        to={product ? `/category/${product.category}` : '/'}
+      >
+        ← Volver {product ? `a ${getNombreCategoria(product.category)}` : 'al catálogo'}
       </Link>
 
       {cargando && <Cargando mensaje="Cargando producto..." />}

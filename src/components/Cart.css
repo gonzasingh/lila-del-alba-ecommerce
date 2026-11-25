@@ -245,6 +245,26 @@
   color: var(--noche);
 }
 
+/* ---------- Compra confirmada ---------- */
+.cart__orden {
+  margin: 0 0 1.25rem;
+  padding: 1rem 1.5rem;
+  border-radius: 24px;
+  background-color: var(--ok-fondo);
+  color: var(--ok);
+}
+
+.cart__orden p {
+  margin: 0.35rem 0;
+}
+
+.cart__orden-id {
+  font-size: 1.4rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
 .cart__seguir {
   align-self: center;
   margin-top: 0.25rem;
@@ -263,6 +283,11 @@
   .cart__resumen {
     position: sticky;
     top: 96px;
+  }
+
+  /* Con el formulario abierto es alto: se deja quieto para poder verlo completo */
+  .cart__resumen--formulario {
+    position: static;
   }
 }
 

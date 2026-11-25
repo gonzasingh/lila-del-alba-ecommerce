@@ -1,13 +1,12 @@
 // Servicio de banners (novedades y promociones del carrusel de la home).
 //
-// Las diapositivas NO están escritas en el código: se leen de un archivo JSON.
-//  - Si existe la variable de entorno VITE_BANNERS_URL, se lee de esa URL remota
-//    (por ejemplo un archivo en GitHub, un Gist o Firebase Hosting). Editando ese
-//    archivo se cambian las promociones SIN volver a publicar el sitio.
-//  - Si no existe, se lee /banners.json (carpeta public del proyecto).
-//  - Si la lectura falla, se muestra una diapositiva de respaldo para que el banner nunca quede vacío.
-// En el módulo de Firebase, esta función se puede reemplazar por una consulta a Firestore
-// y los componentes seguirán recibiendo las diapositivas de la misma forma.
+// Las diapositivas NO están escritas en el código. Se buscan en este orden:
+//  1. Con Firebase configurado, en la colección "banners" de Firestore: se editan desde la
+//     consola de Firebase y el sitio cambia SIN volver a publicarlo.
+//  2. Si no, en el JSON de VITE_BANNERS_URL (URL remota) o en /banners.json (carpeta public).
+//  3. Si nada se puede leer, se muestra una diapositiva de respaldo para que el banner nunca quede vacío.
+import { collection, getDocs } from 'firebase/firestore'
+import { db, firebaseConfigured } from './firebase'
 
 const URL_BANNERS = import.meta.env.VITE_BANNERS_URL || '/banners.json'
 const MAX_DIAPOSITIVAS = 10
@@ -71,8 +70,26 @@ export const normalizarDiapositivas = (datos) => {
     }))
 }
 
+// Documentos de la colección "banners", ordenados por el campo "order"
+const leerDeFirestore = async () => {
+  const respuesta = await getDocs(collection(db, 'banners'))
+  return respuesta.docs
+    .map((documento) => ({ ...documento.data(), id: documento.id }))
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+}
+
 // Devuelve una Promise con las diapositivas vigentes. Nunca se rechaza: ante cualquier error devuelve el respaldo.
 export const getBanners = async (signal) => {
+  if (firebaseConfigured) {
+    try {
+      const documentos = await leerDeFirestore()
+      // Si la colección está vacía todavía no se cargó nada: se sigue con el JSON
+      if (documentos.length > 0) return normalizarDiapositivas(documentos)
+    } catch (error) {
+      console.warn('No se pudieron leer los banners de Firestore:', error.message)
+    }
+  }
+
   try {
     // no-cache: el navegador siempre revalida, así los cambios del JSON se ven al recargar
     const respuesta = await fetch(URL_BANNERS, { signal, cache: 'no-cache' })

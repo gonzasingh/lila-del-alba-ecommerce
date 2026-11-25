@@ -1,0 +1,44 @@
+// Reglas de seguridad de Firestore para la tienda.
+// Se publican desde la consola de Firebase: Firestore Database → Reglas → pegar y "Publicar".
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // El catálogo es público. Desde el sitio solo se puede RESTAR stock (al comprar).
+    match /products/{productId} {
+      allow read: if true;
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['stock'])
+                    && request.resource.data.stock is int
+                    && request.resource.data.stock >= 0
+                    && request.resource.data.stock < resource.data.stock;
+      allow create, delete: if false;
+    }
+
+    // Las promociones del banner se editan desde la consola de Firebase
+    match /banners/{bannerId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Las órdenes tienen datos personales: el sitio puede crearlas, pero no leerlas ni cambiarlas
+    match /orders/{orderId} {
+      allow create: if request.resource.data.keys().hasOnly(
+                         ['buyer', 'items', 'subtotal', 'discount', 'total', 'status', 'date'])
+                    && request.resource.data.buyer.keys().hasOnly(['name', 'phone', 'email'])
+                    && request.resource.data.buyer.name is string
+                    && request.resource.data.buyer.name.size() <= 120
+                    && request.resource.data.buyer.phone is string
+                    && request.resource.data.buyer.phone.size() <= 40
+                    && request.resource.data.buyer.email is string
+                    && request.resource.data.buyer.email.size() <= 160
+                    && request.resource.data.items is list
+                    && request.resource.data.items.size() > 0
+                    && request.resource.data.items.size() <= 100
+                    && request.resource.data.total is number
+                    && request.resource.data.status == 'generada'
+                    && request.resource.data.date == request.time;
+      allow read, update, delete: if false;
+    }
+  }
+}

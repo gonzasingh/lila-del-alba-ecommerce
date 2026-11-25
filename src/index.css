@@ -6,6 +6,12 @@
   --bruma: #f3efff;
   --noche: #1c1535;
 
+  /* ---- Avisos (mismos colores que el sitio de la marca) ---- */
+  --ok: #1e6b34;
+  --ok-fondo: #e8f5ea;
+  --error: #b3261e;
+  --error-fondo: #fdecea;
+
   /* ---- Neutros y derivados de la paleta ---- */
   --blanco: #fefefe;
   --borde: #dcd9ea;

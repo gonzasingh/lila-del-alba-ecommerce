@@ -142,7 +142,23 @@
   text-decoration: underline;
 }
 
-/* Después de agregar: "Terminar mi compra" reemplaza al botón "Agregar al carrito" */
+/* Después de agregar: aviso verde en lugar de las opciones y el contador */
+.item-detail__aviso {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 1.5rem;
+  border-radius: 24px;
+  background-color: var(--ok-fondo);
+}
+
+.item-detail__aviso-texto {
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 1.45;
+  color: var(--ok);
+}
+
 .item-detail__acciones {
   display: flex;
   flex-wrap: wrap;

@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import CheckoutForm from './CheckoutForm'
 import { useCart } from '../context/CartContext'
+import { firebaseConfigured } from '../services/firebase'
+import { crearOrden, SinStockError } from '../services/orders'
 import { formatearPrecio } from '../utils/formatearPrecio'
 import logoFlor from '../assets/logo-flor.svg'
 import './Cart.css'
@@ -11,11 +14,60 @@ function Cart() {
   // lines: cada línea del carrito con su precio ya calculado (incluye el descuento por pack x10)
   const { lines, removeItem, clear, totalItems, subtotal, discount, totalPrice } = useCart()
 
-  // "Finalizar compra" es un placeholder: el checkout real llega en el módulo de Firebase
-  const [avisoCheckout, setAvisoCheckout] = useState(false)
+  // "Finalizar compra" abre el formulario; la orden se guarda en Firestore
+  const [mostrarCheckout, setMostrarCheckout] = useState(false)
+  const [enviando, setEnviando] = useState(false)
+  const [errorOrden, setErrorOrden] = useState('')
+  const [orden, setOrden] = useState(null) // { id, total } cuando la compra se completó
 
   // Productos distintos (un mismo producto puede ocupar varias líneas, una por variedad)
   const totalProductos = new Set(lines.map((linea) => linea.id)).size
+
+  const confirmarCompra = async (comprador) => {
+    setEnviando(true)
+    setErrorOrden('')
+
+    try {
+      const id = await crearOrden({
+        comprador,
+        lineas: lines,
+        subtotal,
+        descuento: discount,
+        total: totalPrice,
+      })
+      setOrden({ id, total: totalPrice })
+      clear()
+    } catch (error) {
+      setErrorOrden(
+        error instanceof SinStockError
+          ? `No hay stock suficiente de ${error.faltantes
+              .map((f) => `${f.name} (quedan ${f.disponible})`)
+              .join(', ')}.`
+          : 'No pudimos generar la orden. Intentá de nuevo en unos minutos.',
+      )
+    } finally {
+      setEnviando(false)
+    }
+  }
+
+  // Compra confirmada: se muestra el número de orden (el carrito ya quedó vacío)
+  if (orden) {
+    return (
+      <main className="cart cart--vacio">
+        <img className="cart__flor" src={logoFlor} alt="" />
+        <h1 className="cart__titulo">¡Gracias por tu compra!</h1>
+        <div className="cart__orden" role="status">
+          <p>Tu número de orden es</p>
+          <p className="cart__orden-id">{orden.id}</p>
+          <p>Total: {formatearPrecio(orden.total)}</p>
+        </div>
+        <p className="cart__mensaje">Guardá este número para consultar por tu pedido.</p>
+        <Link className="cart__boton cart__boton--principal" to="/">
+          Seguir comprando
+        </Link>
+      </main>
+    )
+  }
 
   // Carrito vacío: mensaje y link para volver al catálogo
   if (lines.length === 0) {
@@ -92,6 +144,7 @@ function Cart() {
                 type="button"
                 className="cart__eliminar"
                 onClick={() => removeItem(item.id, item.lineId)}
+                disabled={enviando}
                 aria-label={`Eliminar ${[item.name, ...item.selection.map((e) => e.value)].join(', ')} del carrito`}
               >
                 Eliminar
@@ -100,7 +153,10 @@ function Cart() {
           ))}
         </ul>
 
-        <aside className="cart__resumen" aria-label="Resumen de la compra">
+        <aside
+          className={mostrarCheckout ? 'cart__resumen cart__resumen--formulario' : 'cart__resumen'}
+          aria-label="Resumen de la compra"
+        >
           <h2 className="cart__resumen-titulo">Resumen</h2>
 
           <p className="cart__resumen-fila">
@@ -128,21 +184,35 @@ function Cart() {
             <strong>{formatearPrecio(totalPrice)}</strong>
           </p>
 
-          <button
-            type="button"
-            className="cart__boton cart__boton--principal"
-            onClick={() => setAvisoCheckout(true)}
-          >
-            Finalizar compra
-          </button>
+          {mostrarCheckout && firebaseConfigured ? (
+            <CheckoutForm
+              onSubmit={confirmarCompra}
+              onCancel={() => setMostrarCheckout(false)}
+              enviando={enviando}
+              error={errorOrden}
+            />
+          ) : (
+            <button
+              type="button"
+              className="cart__boton cart__boton--principal"
+              onClick={() => setMostrarCheckout(true)}
+            >
+              Finalizar compra
+            </button>
+          )}
 
-          {avisoCheckout && (
+          {mostrarCheckout && !firebaseConfigured && (
             <p className="cart__aviso" role="status">
-              queda pendiente para finalizar la compra.
+              La compra online todavía no está disponible: falta configurar Firebase.
             </p>
           )}
 
-          <button type="button" className="cart__boton cart__boton--secundario" onClick={clear}>
+          <button
+            type="button"
+            className="cart__boton cart__boton--secundario"
+            onClick={clear}
+            disabled={enviando}
+          >
             Vaciar carrito
           </button>
 

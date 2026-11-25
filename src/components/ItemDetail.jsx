@@ -63,10 +63,11 @@ function ItemDetail({ product }) {
   const handleAdd = (cantidad) => {
     const selection = grupos.map((grupo) => ({ label: grupo.label, value: elecciones[grupo.id] }))
     addItem({ ...product, selection }, cantidad)
-    setAgregado({ cantidad, detalle: selection.map((eleccion) => eleccion.value).join(', ') })
+    setAgregado({ cantidad, detalle: selection.map((eleccion) => eleccion.value).join(' · ') })
   }
 
-  const elegirOtraVariedad = () => {
+  // "Seguir comprando": vuelve a mostrar las opciones para agregar otra variedad del producto
+  const seguirComprando = () => {
     setAgregado(null)
     setElecciones({})
   }
@@ -125,68 +126,66 @@ function ItemDetail({ product }) {
           </section>
         )}
 
-        <div className="item-detail__compra">
-          {/* Las opciones se eligen antes de agregar al carrito */}
-          {!agregado &&
-            disponible > 0 &&
-            grupos.map((grupo) => (
-              <OptionPicker
-                key={grupo.id}
-                legend={grupo.title}
-                name={grupo.id}
-                options={grupo.choices.map((opcion) => ({ value: opcion, label: opcion }))}
-                value={elecciones[grupo.id] ?? ''}
-                onChange={(valor) => elegir(grupo.id, valor)}
-              />
-            ))}
-
-          <p className="item-detail__stock">{textoStock}</p>
-
-          {agregado ? (
-            // Ya agregó: el botón "Agregar" se reemplaza por "Terminar mi compra" (lleva a /cart)
-            <>
-              <p className="item-detail__confirmacion" role="status">
-                ¡Listo! Agregaste {agregado.cantidad}{' '}
-                {agregado.cantidad === 1 ? 'unidad' : 'unidades'} al carrito
-                {agregado.detalle && `: ${agregado.detalle}`}.
-              </p>
-              <div className="item-detail__acciones">
-                <Link className="item-detail__terminar" to="/cart">
-                  Terminar mi compra
-                </Link>
-                {grupos.length > 0 && disponible > 0 && (
-                  <button type="button" className="item-detail__seguir" onClick={elegirOtraVariedad}>
-                    Agregar otra variedad
-                  </button>
-                )}
-                <Link className="item-detail__seguir" to="/">
+        {agregado ? (
+          // Ya agregó: aviso verde con "Ver carrito" y "Seguir comprando"
+          <div className="item-detail__aviso">
+            <p className="item-detail__aviso-texto" role="status">
+              Agregaste {agregado.cantidad} {agregado.cantidad === 1 ? 'unidad' : 'unidades'}
+              {agregado.detalle && ` (${agregado.detalle})`} al carrito.
+            </p>
+            <div className="item-detail__acciones">
+              <Link className="item-detail__terminar" to="/cart">
+                Ver carrito
+              </Link>
+              {disponible > 0 ? (
+                <button type="button" className="item-detail__seguir" onClick={seguirComprando}>
+                  Seguir comprando
+                </button>
+              ) : (
+                // Ya no queda stock de este producto: se sigue comprando en su categoría
+                <Link className="item-detail__seguir" to={`/category/${category}`}>
                   Seguir comprando
                 </Link>
-              </div>
-            </>
-          ) : (
-            <>
-              {disponible > 0 ? (
-                <ItemCount stock={disponible} onAdd={handleAdd} motivoBloqueo={motivoBloqueo} />
-              ) : (
-                stock > 0 && (
-                  <p className="item-detail__confirmacion">
-                    Ya tenés todo el stock disponible en tu carrito.
-                  </p>
-                )
               )}
-              {cantidadEnCarrito > 0 && (
-                <p className="item-detail__en-carrito">
-                  Tenés {cantidadEnCarrito} {cantidadEnCarrito === 1 ? 'unidad' : 'unidades'} de
-                  este producto en el carrito.{' '}
-                  <Link className="item-detail__enlace" to="/cart">
-                    Terminar mi compra
-                  </Link>
+            </div>
+          </div>
+        ) : (
+          <div className="item-detail__compra">
+            {/* Las opciones se eligen antes de agregar al carrito */}
+            {disponible > 0 &&
+              grupos.map((grupo) => (
+                <OptionPicker
+                  key={grupo.id}
+                  legend={grupo.title}
+                  name={grupo.id}
+                  options={grupo.choices.map((opcion) => ({ value: opcion, label: opcion }))}
+                  value={elecciones[grupo.id] ?? ''}
+                  onChange={(valor) => elegir(grupo.id, valor)}
+                />
+              ))}
+
+            <p className="item-detail__stock">{textoStock}</p>
+
+            {disponible > 0 ? (
+              <ItemCount stock={disponible} onAdd={handleAdd} motivoBloqueo={motivoBloqueo} />
+            ) : (
+              stock > 0 && (
+                <p className="item-detail__confirmacion">
+                  Ya tenés todo el stock disponible en tu carrito.
                 </p>
-              )}
-            </>
-          )}
-        </div>
+              )
+            )}
+            {cantidadEnCarrito > 0 && (
+              <p className="item-detail__en-carrito">
+                Tenés {cantidadEnCarrito} {cantidadEnCarrito === 1 ? 'unidad' : 'unidades'} de este
+                producto en el carrito.{' '}
+                <Link className="item-detail__enlace" to="/cart">
+                  Ver carrito
+                </Link>
+              </p>
+            )}
+          </div>
+        )}
       </div>
     </article>
   )

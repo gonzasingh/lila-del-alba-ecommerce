@@ -11,7 +11,7 @@ El proyecto avanza por etapas. Hasta ahora tiene la estructura base, el **listad
 (rutas anidadas con un layout compartido) y un **carrito de compras funcional** basado en Context API: se agrega desde el detalle,
 se ve en el `CartWidget` del Navbar y en la página `/cart`, donde se puede quitar cada producto, vaciar todo y ver el total. Los datos se cargan de forma asíncrona
 desde una API simulada. La interfaz sigue la **identidad visual refinada** de la marca (ver "Identidad visual"), es **responsive** (menú hamburguesa y
-grilla de 2 columnas en celulares) y la home incluye un **banner en forma de carrusel cuyas promociones se editan sin tocar el código** (ver "Banner de novedades y promociones"). En las próximas entregas se irán sumando el checkout y la conexión con Firebase.
+grilla de 2 columnas en celulares) y la home incluye un **banner en forma de carrusel cuyas promociones se editan sin tocar el código** (ver "Banner de novedades y promociones"). Está **conectada con Firebase (Firestore)**: productos, banners, órdenes de compra y stock (ver "Firebase"); sin credenciales funciona con datos locales.
 
 ## Tecnologías utilizadas
 
@@ -20,6 +20,7 @@ grilla de 2 columnas en celulares) y la home incluye un **banner en forma de car
 - [Vite](https://vite.dev/)
 - JavaScript (ES Modules)
 - CSS tradicional (un archivo por componente y variables de color globales)
+- [Firebase](https://firebase.google.com/) (Cloud Firestore)
 - Tipografía [Outfit](https://fonts.google.com/specimen/Outfit) (Google Fonts), la misma del sitio de la marca
 - ESLint
 - Node.js y npm
@@ -94,19 +95,20 @@ Todos los componentes viven en `src/components`, cada uno con su archivo `.jsx` 
 | `ItemList` | Recibe los productos por props (`items`), los recorre con `.map()` y renderiza un `Item` por cada uno, usando el `id` del producto como `key`. En celulares (hasta 600 px) la grilla pasa a **2 columnas**, de modo que en cada pantalla se ven 4 productos (2 filas de 2). |
 | `Item` | Card con la información **resumida** de un producto (imagen, categoría, nombre y precio) y un link "Ver detalle" a `/item/:id`. |
 | `ItemDetailContainer` | Contenedor del detalle. Lee el `id` de la URL (`/item/:id`), ejecuta `getProductById` dentro de un `useEffect`, guarda el producto en el estado `product` y se lo entrega por props a `ItemDetail`. No contiene el diseño del producto ni toca el carrito. |
-| `ItemDetail` | Presentación del detalle completo: imagen, categoría, nombre, precio, descripción, stock y la información que no aparece en la card (presentación, envase, características y precio por pack x10). Antes de agregar se eligen con botones la **fragancia** y las **opciones propias** del producto (arcilla, tipo de cabello, color). **Consume el contexto** (`useCart`): al confirmar una cantidad en `ItemCount` llama a `addItem({ ...product, selection }, quantity)` y, una vez agregado, reemplaza el contador por el botón **"Terminar mi compra"** (lleva a `/cart`). |
+| `ItemDetail` | Presentación del detalle completo: imagen, categoría, nombre, precio, descripción, stock y la información que no aparece en la card (presentación, envase, características y precio por pack x10). Antes de agregar se eligen con botones la **fragancia** y las **opciones propias** del producto (arcilla, tipo de cabello, color). **Consume el contexto** (`useCart`): al confirmar una cantidad en `ItemCount` llama a `addItem({ ...product, selection }, quantity)` y, una vez agregado, muestra un aviso con **"Ver carrito"** y **"Seguir comprando"** (vuelve a mostrar las opciones para agregar otra variedad). El link "Volver" lleva a la **categoría** del producto. |
 | `OptionPicker` | Grupo de opciones con forma de botón, de elección única (radios nativos, accesibles por teclado). |
 | `ItemCount` | Contador de cantidad reutilizable. Recibe el `stock` por props: no permite superarlo ni bajar de cero. El botón "Agregar al carrito" informa la cantidad elegida a través de la prop `onAdd`. |
-| `Cart` | Página del carrito (ruta `/cart`). Con el carrito vacío muestra un mensaje y un link para volver al catálogo. Con productos lista, de cada uno, nombre, cantidad, precio unitario y subtotal, con un botón "Eliminar" por producto; además muestra el **total**, el botón "Vaciar carrito" y un botón "Finalizar compra" que por ahora es un placeholder. |
+| `Cart` | Página del carrito (ruta `/cart`). Con el carrito vacío muestra un mensaje y un link para volver al catálogo. Con productos lista, de cada uno, nombre, cantidad, precio unitario y subtotal, con un botón "Eliminar" por producto; además muestra el **total**, el botón "Vaciar carrito" y "Finalizar compra", que abre el `CheckoutForm` y al confirmar muestra el número de orden. |
+| `CheckoutForm` | Formulario del comprador (nombre, teléfono, email y su repetición) con validación. |
 | `Footer` | Pie de página sobre fondo oscuro con la versión del logo para fondo oscuro, las categorías y links a la tienda y al carrito (con `Link`). Se muestra en todas las rutas gracias al `Layout`. |
 | `NotFound` | Mensaje para rutas o categorías inexistentes, con un link al catálogo. |
 | `Cargando` | Indicador de carga que comparten los contenedores. |
 | `ScrollToTop` | Vuelve al inicio de la página cada vez que cambia la ruta. |
 
-## Carga de datos asíncrona (simulada)
+## Carga de datos asíncrona
 
-Todavía no hay un servidor ni una base de datos, así que la obtención de datos se simula
-para que la aplicación se comporte como lo hará con datos reales (Firebase, en una etapa posterior).
+Los contenedores piden los datos a `src/services/products.js`. Con Firebase configurado, esa función consulta Firestore (ver "Firebase");
+sin configurar, usa el mock que se describe a continuación, que devuelve los datos con el mismo formato y una demora simulada.
 
 **1. Los datos** (`src/mock/products.js`). Un array con los 23 productos de la lista de precios. Cada producto tiene las propiedades
 `id`, `name`, `price`, `category`, `img`, `stock` y `description`, y algunos suman información extra
@@ -200,10 +202,38 @@ Por cada 10 se aplica `priceX10` y las restantes van a precio normal (11 = 10 en
 descuento en el resumen. Con el stock de ejemplo, los productos con menos de 10 unidades nunca llegan al pack.
 
 **Flujo de compra:** en el detalle, `ItemCount` recibe como stock lo que **todavía queda disponible** (stock menos lo que ya está en el carrito),
-así que nunca se puede agregar más que el stock total. Al tocar "Agregar al carrito", `ItemDetail` llama a `addItem` y muestra "Terminar mi compra", que
-lleva a `/cart`, junto con "Agregar otra variedad" y "Seguir comprando". En el carrito el cliente ve cada producto con sus opciones, cantidad,
-precio unitario y subtotal, puede eliminarlos de a uno o vaciar el carrito, y ve el total antes de decidir. "Finalizar compra" es un placeholder:
-la orden de compra se genera en el módulo de Firebase. El carrito vive en memoria, por lo que se vacía al recargar la página.
+así que nunca se puede agregar más que el stock total. Al tocar "Agregar al carrito", `ItemDetail` llama a `addItem` y muestra el aviso
+con "Ver carrito" y "Seguir comprando". En el carrito el cliente ve cada producto con sus opciones, cantidad,
+precio unitario y subtotal, puede eliminarlos de a uno o vaciar el carrito, y ve el total antes de decidir. "Finalizar compra" genera la orden en Firestore.
+El carrito vive en memoria, por lo que se vacía al recargar la página.
+
+## Firebase
+
+`src/services/firebase.js` lee la configuración de las variables `VITE_FIREBASE_*`. Si están cargadas, la tienda usa Firestore; si no, usa los datos locales
+(`asyncMock` y `banners.json`) y el checkout avisa que no está disponible.
+
+| Colección | Contenido | Quién la usa |
+|-----------|-----------|--------------|
+| `products` | Un documento por producto (el id del documento es el id del producto), con `order` para ordenar. | `services/products.js` (listado, categoría con `where` y detalle). |
+| `banners` | Una diapositiva por documento (mismos campos que `banners.json`, más `order`). Las fechas `from` / `to` se escriben como texto `AAAA-MM-DD`. | `services/banners.js` |
+| `orders` | `buyer`, `items` (con las opciones elegidas), `subtotal`, `discount`, `total`, `status` y `date`. | `services/orders.js` |
+
+**Compra:** `crearOrden` usa una **transacción**: lee el stock actual, y solo si alcanza descuenta las unidades y guarda la orden. Si no alcanza, no cambia nada
+y se informa qué producto falta.
+
+### Puesta en marcha
+
+1. En la [consola de Firebase](https://console.firebase.google.com/) elegí tu proyecto, creá **Firestore Database** y registrá una **app web**.
+2. Copiá `.env.example` como `.env.local` y completá los valores de la configuración de esa app.
+3. Con las reglas en **modo de prueba** (permiten escribir), cargá los datos: `npm run seed`.
+4. Publicá las reglas de `firestore.rules` (Firestore Database → Reglas → pegar → Publicar). **No dejes el modo de prueba.**
+5. Reiniciá `npm run dev`. En Vercel, cargá las mismas variables en *Environment Variables* y volvé a desplegar.
+
+`npm run seed -- --force` reemplaza productos y banners (vuelve el stock a los valores del archivo); con las reglas publicadas hay que volver a permitir la escritura.
+
+**Límites de seguridad (sin servidor propio):** las reglas impiden crear o cambiar productos, subir stock y leer órdenes desde el sitio, pero la compra se arma
+en el navegador: alguien con conocimientos podría enviar una orden con precios alterados o descontar stock sin comprar. Revisá los totales antes de cobrar;
+para impedirlo hace falta validar en el servidor (Cloud Functions).
 
 ## Identidad visual
 
@@ -239,7 +269,7 @@ El carrusel de la home (`src/components/Banner.jsx`) no tiene las promociones es
 2. Si no existe, del archivo `public/banners.json` del proyecto (se edita y se vuelve a publicar).
 3. Si no se puede leer (sin conexión, JSON roto, etc.), se muestra una diapositiva de respaldo para que el banner nunca quede vacío.
 
-Cuando se incorpore Firebase, `getBanners()` se puede reemplazar por una consulta a Firestore sin tocar el componente.
+Con Firebase configurado, la colección `banners` de Firestore tiene prioridad: se editan desde la consola y los puntos anteriores quedan de respaldo.
 
 **Formato del JSON** (un objeto con un array `slides`; el orden del array es el orden del carrusel):
 
@@ -287,7 +317,7 @@ Por seguridad, `getBanners()` valida lo que lee: descarta las diapositivas sin t
 ## Datos y fotos
 
 - Los precios, el precio por pack x10, los envases y los aromas salen de la lista de precios y de la lista de fragancias de la marca.
-- El **stock es de ejemplo**: se reemplazará por los valores reales cuando los datos vengan de Firebase.
+- El **stock es de ejemplo**: con Firebase, cargá los valores reales en cada documento de `products`.
 - Las fotos de `public/productos` son las del sitio de la marca ([liladelalba.vercel.app](https://liladelalba.vercel.app/)). Los productos que ahí
   no tienen una foto propia comparten la de su categoría, igual que en el sitio: cremas (`cremas.webp`), aceites (`aceites.webp`),
   shampoo sólido (`shampoo-solido.webp`) y hogar (`hogar.webp`, para el difusor de 60 ml, el difusor para auto y el spray textil).
@@ -296,6 +326,10 @@ Por seguridad, `getBanners()` valida lo que lee: descarta las diapositivas sin t
 ## Estructura del proyecto
 
 ```
+.env.example              # plantilla de las variables de Firebase
+firestore.rules           # reglas de seguridad para publicar en la consola
+scripts/
+└── seed-firestore.mjs    # npm run seed: carga productos y banners
 public/
 ├── banners.json          # diapositivas del carrusel (editable)
 ├── banners/
@@ -312,6 +346,7 @@ src/
 │   ├── Banner.jsx / .css
 │   ├── Cargando.jsx / .css
 │   ├── Cart.jsx / .css
+│   ├── CheckoutForm.jsx / .css
 │   ├── CartWidget.jsx / .css
 │   ├── Footer.jsx / .css
 │   ├── Item.jsx / .css
@@ -332,7 +367,10 @@ src/
 │   ├── categories.js     # categorías de la tienda
 │   └── products.js       # catálogo de productos
 ├── services/
-│   └── banners.js        # getBanners: lee y valida las diapositivas del carrusel
+│   ├── banners.js        # getBanners: lee y valida las diapositivas del carrusel
+│   ├── firebase.js       # inicialización de Firebase
+│   ├── orders.js         # crearOrden: orden + descuento de stock
+│   └── products.js       # getProducts y getProductById (Firestore o mock)
 ├── utils/
 │   ├── formatearPrecio.js
 │   └── precios.js        # calcularPrecios: descuento por pack x10
