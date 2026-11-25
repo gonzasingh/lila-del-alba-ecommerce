@@ -1,0 +1,40 @@
+{
+  "slides": [
+    {
+      "id": "coleccion",
+      "title": "Una colección para cualquier espacio y momento",
+      "text": "Velas, difusores, spray textil y cuidado personal. Todas las fragancias son aptas para velas, difusores y spray textil.",
+      "buttonText": "Ver productos",
+      "link": "#catalogo",
+      "image": "/banners/hero.webp",
+      "imageAlt": "Mujer sonriendo con una toalla en el pelo y una crema en la mano",
+      "imageFit": "contain",
+      "theme": "lila",
+      "active": true
+    },
+    {
+      "id": "hogar",
+      "title": "Aromas para tu hogar",
+      "text": "Difusores, velas de soja y spray textil con la fragancia que elijas.",
+      "buttonText": "Ver hogar",
+      "link": "/category/hogar",
+      "image": "/productos/hogar.webp",
+      "imageAlt": "Spray textil y difusor con varillas junto a una toalla",
+      "imageFit": "cover",
+      "theme": "amanecer",
+      "active": true
+    },
+    {
+      "id": "packs",
+      "title": "Llevá más, pagá menos por unidad",
+      "text": "En jabones, cremas, aceites, sérum, bálsamos y ducha, comprando un pack de 10 unidades cada una sale a menor precio. Mirá el precio por pack en el detalle de cada producto.",
+      "buttonText": "Ver cremas",
+      "link": "/category/cremas",
+      "image": "/productos/cremas.webp",
+      "imageAlt": "Crema corporal en frasco y en lata",
+      "imageFit": "cover",
+      "theme": "noche",
+      "active": true
+    }
+  ]
+}

@@ -10,7 +10,8 @@ El proyecto avanza por etapas. Hasta ahora tiene la estructura base, el **listad
 (con filtro por categoría), la **vista de detalle de cada producto**, la **navegación con React Router**
 (rutas anidadas con un layout compartido) y un **carrito de compras funcional** basado en Context API: se agrega desde el detalle,
 se ve en el `CartWidget` del Navbar y en la página `/cart`, donde se puede quitar cada producto, vaciar todo y ver el total. Los datos se cargan de forma asíncrona
-desde una API simulada. La interfaz sigue la **identidad visual refinada** de la marca (ver "Identidad visual"). En las próximas entregas se irán sumando el checkout y la conexión con Firebase.
+desde una API simulada. La interfaz sigue la **identidad visual refinada** de la marca (ver "Identidad visual"), es **responsive** (menú hamburguesa y
+grilla de 2 columnas en celulares) y la home incluye un **banner en forma de carrusel cuyas promociones se editan sin tocar el código** (ver "Banner de novedades y promociones"). En las próximas entregas se irán sumando el checkout y la conexión con Firebase.
 
 ## Tecnologías utilizadas
 
@@ -19,6 +20,7 @@ desde una API simulada. La interfaz sigue la **identidad visual refinada** de la
 - [Vite](https://vite.dev/)
 - JavaScript (ES Modules)
 - CSS tradicional (un archivo por componente y variables de color globales)
+- Tipografía [Outfit](https://fonts.google.com/specimen/Outfit) (Google Fonts), la misma del sitio de la marca
 - ESLint
 - Node.js y npm
 - Git y GitHub
@@ -85,13 +87,15 @@ Todos los componentes viven en `src/components`, cada uno con su archivo `.jsx` 
 | Componente | Descripción |
 |------------|-------------|
 | `Layout` | Estructura compartida por todas las rutas: `Navbar`, `Footer` y un `<Outlet />` donde se dibuja la página de la ruta actual. También incluye `ScrollToTop`. |
-| `Navbar` | Barra de navegación fija en la parte superior. Muestra el logo horizontal de la marca, las categorías de productos (generadas con `map` a partir de `src/mock/categories.js`) como `NavLink` a `/category/:categoryId`, y el `CartWidget`. |
+| `Navbar` | Barra de navegación fija en la parte superior. Muestra el logo horizontal de la marca, las categorías de productos (generadas con `map` a partir de `src/mock/categories.js`) como `NavLink` a `/category/:categoryId`, y el `CartWidget`. En pantallas de hasta 900 px las categorías pasan a un **menú desplegable tipo hamburguesa**: se abre y cierra con el botón (`aria-expanded`), se cierra al elegir una categoría, con la tecla Escape o al tocar fuera de la barra. |
+| `Banner` | Carrusel de novedades y promociones de la home. Lee sus diapositivas de un JSON editable (ver más abajo), avanza solo cada 6 segundos, se pausa con el mouse encima, con el foco o con el botón de pausa, y se puede recorrer con las flechas, los puntos, deslizando con el dedo o con las teclas ← →. |
 | `CartWidget` | Link a `/cart` con el ícono y un círculo con la cantidad total de unidades (`totalItems`, que lee del contexto con `useCart`). Con el carrito vacío no muestra el número. |
-| `ItemListContainer` | Contenedor del catálogo. Lee el `id` de la URL (`/category/:id`), obtiene los productos con `getProducts(categoryId)` dentro de un `useEffect`, los guarda en el estado `items` y se los pasa por props a `ItemList`. Maneja los estados de carga y de error. No hace el `.map()`. |
-| `ItemList` | Recibe los productos por props (`items`), los recorre con `.map()` y renderiza un `Item` por cada uno, usando el `id` del producto como `key`. |
+| `ItemListContainer` | Contenedor del catálogo. Lee el `id` de la URL (`/category/:id`), obtiene los productos con `getProducts(categoryId)` dentro de un `useEffect`, los guarda en el estado `items` y se los pasa por props a `ItemList`. Maneja los estados de carga y de error. En la home (`/`) muestra el `Banner` arriba; en todas las rutas muestra el título y la cantidad de productos. No hace el `.map()`. |
+| `ItemList` | Recibe los productos por props (`items`), los recorre con `.map()` y renderiza un `Item` por cada uno, usando el `id` del producto como `key`. En celulares (hasta 600 px) la grilla pasa a **2 columnas**, de modo que en cada pantalla se ven 4 productos (2 filas de 2). |
 | `Item` | Card con la información **resumida** de un producto (imagen, categoría, nombre y precio) y un link "Ver detalle" a `/item/:id`. |
 | `ItemDetailContainer` | Contenedor del detalle. Lee el `id` de la URL (`/item/:id`), ejecuta `getProductById` dentro de un `useEffect`, guarda el producto en el estado `product` y se lo entrega por props a `ItemDetail`. No contiene el diseño del producto ni toca el carrito. |
-| `ItemDetail` | Presentación del detalle completo: imagen, categoría, nombre, precio, descripción, stock y la información que no aparece en la card (presentación, envase, características, aromas y precio por pack x10). **Consume el contexto** (`useCart`): al confirmar una cantidad en `ItemCount` llama a `addItem(product, quantity)` y, una vez agregado, reemplaza el contador por el botón **"Terminar mi compra"** (lleva a `/cart`) y un link "Seguir comprando". |
+| `ItemDetail` | Presentación del detalle completo: imagen, categoría, nombre, precio, descripción, stock y la información que no aparece en la card (presentación, envase, características y precio por pack x10). Antes de agregar se eligen con botones la **fragancia** y las **opciones propias** del producto (arcilla, tipo de cabello, color). **Consume el contexto** (`useCart`): al confirmar una cantidad en `ItemCount` llama a `addItem({ ...product, selection }, quantity)` y, una vez agregado, reemplaza el contador por el botón **"Terminar mi compra"** (lleva a `/cart`). |
+| `OptionPicker` | Grupo de opciones con forma de botón, de elección única (radios nativos, accesibles por teclado). |
 | `ItemCount` | Contador de cantidad reutilizable. Recibe el `stock` por props: no permite superarlo ni bajar de cero. El botón "Agregar al carrito" informa la cantidad elegida a través de la prop `onAdd`. |
 | `Cart` | Página del carrito (ruta `/cart`). Con el carrito vacío muestra un mensaje y un link para volver al catálogo. Con productos lista, de cada uno, nombre, cantidad, precio unitario y subtotal, con un botón "Eliminar" por producto; además muestra el **total**, el botón "Vaciar carrito" y un botón "Finalizar compra" que por ahora es un placeholder. |
 | `Footer` | Pie de página sobre fondo oscuro con la versión del logo para fondo oscuro, las categorías y links a la tienda y al carrito (con `Link`). Se muestra en todas las rutas gracias al `Layout`. |
@@ -106,7 +110,7 @@ para que la aplicación se comporte como lo hará con datos reales (Firebase, en
 
 **1. Los datos** (`src/mock/products.js`). Un array con los 23 productos de la lista de precios. Cada producto tiene las propiedades
 `id`, `name`, `price`, `category`, `img`, `stock` y `description`, y algunos suman información extra
-(`priceX10`, `presentation`, `container`, `features`, `aromas`) que solo se muestra en el detalle.
+(`priceX10`, `presentation`, `container`, `features`, `aromas`, `options`) que solo se usa en el detalle.
 
 **2. Las funciones asíncronas** (`src/mock/asyncMock.js`). Cada una devuelve una `Promise` que usa `setTimeout` para resolverse con retraso,
 imitando la demora de una conexión real:
@@ -172,24 +176,34 @@ El estado del carrito se comparte con toda la aplicación mediante Context API. 
 
 | Valor del contexto | Qué hace |
 |--------------------|----------|
-| `cart` | Array de productos agregados: `{ id, name, price, img, category, stock, quantity }`. |
-| `addItem(item, quantity)` | Agrega un producto. Si ya está en el carrito (se compara por `id`) **no lo duplica**: suma la cantidad nueva a la existente (sin superar el stock). |
-| `removeItem(itemId)` | Elimina un producto del carrito por su id. |
+| `cart` | Array de líneas agregadas: `{ lineId, id, name, price, priceX10, img, category, stock, selection, quantity }`. `selection` guarda lo elegido (`[{ label, value }]`). Hay una línea por cada combinación distinta de producto y opciones. |
+| `lines` | Las mismas líneas con el precio ya calculado: `unidadesPack`, `unidadesNormales`, `subtotalSinDescuento` y `subtotal`. |
+| `addItem(item, quantity)` | Agrega un producto (lo elegido viaja en `item.selection`). Si ya hay uno idéntico (mismo `id` y mismas opciones) **no lo duplica**: suma la cantidad (sin superar el stock del producto, contando todas sus variedades). |
+| `removeItem(itemId, lineId?)` | Elimina un producto por su id. Si se indica el `lineId`, quita solo esa variedad. |
 | `clear()` | Vacía el carrito por completo. |
 | `isInCart(id)` | Devuelve un booleano: `true` si el producto ya está en el carrito. |
-| `getQuantity(id)` | Cantidad de ese producto que hay en el carrito (0 si no está). |
+| `getQuantity(id)` | Unidades de ese producto que hay en el carrito, sumando sus variedades (0 si no está). |
 | `totalItems` | Suma de las cantidades de todos los productos (es el número del `CartWidget`). |
-| `totalPrice` | Precio total de la compra. |
+| `subtotal` / `discount` / `totalPrice` | Total a precio de lista, descuento por packs y total a pagar. |
 
 **Inmutabilidad:** todas las actualizaciones crean copias y nunca modifican el array original: `addItem` usa `.map()` para sumar la cantidad
-a un item existente y `[...prev, nuevo]` para agregar uno nuevo; `removeItem` usa `.filter()`; `clear` reemplaza el estado por un array nuevo.
-`totalItems` y `totalPrice` se calculan con `.reduce()` a partir del carrito, no se guardan aparte.
+a una línea existente y `[...prev, nueva]` para agregar una nueva; `removeItem` usa `.filter()`; `clear` reemplaza el estado por un array nuevo.
+Los totales se calculan a partir del carrito, no se guardan aparte.
+
+**Opciones antes de agregar:** en el detalle las elecciones son **botones** (`OptionPicker`, radios nativos con forma de botón) y hay que completarlas todas para
+poder agregar. Son la fragancia (`aromas`) y las opciones declaradas en `options` en `products.js`: color de la arcilla (jabones con arcilla), tipo de cabello
+(shampoo) y con o sin color (bálsamos). Las versiones con y sin fragancia son productos separados del catálogo.
+
+**Descuento por pack x10** (`src/utils/precios.js`): el pack son 10 unidades **exactamente iguales** (mismo producto, misma fragancia y mismas opciones).
+Por cada 10 se aplica `priceX10` y las restantes van a precio normal (11 = 10 en pack + 1 normal; 20 = 20 en pack). Combinar variedades no cuenta:
+6 de una fragancia y 5 de otra no tienen descuento. Los productos de **hogar** no tienen precio por pack. El carrito muestra el desglose en la línea y el
+descuento en el resumen. Con el stock de ejemplo, los productos con menos de 10 unidades nunca llegan al pack.
 
 **Flujo de compra:** en el detalle, `ItemCount` recibe como stock lo que **todavía queda disponible** (stock menos lo que ya está en el carrito),
 así que nunca se puede agregar más que el stock total. Al tocar "Agregar al carrito", `ItemDetail` llama a `addItem` y muestra "Terminar mi compra", que
-lleva a `/cart`. Ahí el cliente ve cada producto con su cantidad, precio unitario y subtotal, puede eliminarlos de a uno o vaciar el carrito, y ve el total
-antes de decidir. "Finalizar compra" es un placeholder: la orden de compra se genera en el módulo de Firebase. El carrito vive en memoria,
-por lo que se vacía al recargar la página.
+lleva a `/cart`, junto con "Agregar otra variedad" y "Seguir comprando". En el carrito el cliente ve cada producto con sus opciones, cantidad,
+precio unitario y subtotal, puede eliminarlos de a uno o vaciar el carrito, y ve el total antes de decidir. "Finalizar compra" es un placeholder:
+la orden de compra se genera en el módulo de Firebase. El carrito vive en memoria, por lo que se vacía al recargar la página.
 
 ## Identidad visual
 
@@ -206,7 +220,69 @@ El diseño sigue el documento *Lila del Alba — Identidad mejorada* (sistema de
 - Los colores están definidos como variables CSS en `src/index.css` (`--lila`, `--violeta`, `--amanecer`, `--bruma`, `--noche`), junto con la tipografía, el radio de los bordes y la sombra.
 - **Logos** (en `src/assets`, extraídos del SVG de la marca): `logo-horizontal.svg` (cabecera web), `logo-horizontal-oscuro.svg` (sobre fondo oscuro, usado en el pie de página) y `logo-flor.svg` (isotipo, usado en el carrito vacío).
 - **Íconos** (en `public`): `favicon.svg` y `favicon.png` (ícono de app) y `apple-touch-icon.png`.
-- El texto del logo está convertido a trazados, así que la tipografía de la interfaz usa fuentes del sistema (Georgia para los títulos).
+- **Tipografía:** Outfit (pesos 400, 500, 600 y 700), cargada desde Google Fonts en `index.html`, igual que en el sitio de la marca. Se define en la variable `--fuente-texto` (y `--fuente-titulos`) de `src/index.css`, con fuentes del sistema como respaldo.
+
+## Banner de novedades y promociones
+
+El carrusel de la home (`src/components/Banner.jsx`) no tiene las promociones escritas en el código: las lee de un **archivo JSON** mediante `getBanners()`
+(`src/services/banners.js`). Para cambiar, agregar o quitar promociones solo hay que editar ese JSON.
+
+**¿De dónde se lee?**
+
+1. Si existe la variable de entorno `VITE_BANNERS_URL`, de esa **URL remota**. Así las promociones se modifican **sin volver a publicar el sitio**:
+   se edita el archivo en su lugar de hosting y al recargar la página el banner ya cambió. Ejemplos de dónde alojarlo: un archivo en un repositorio de GitHub
+   (URL `raw.githubusercontent.com/...`) o un Gist. El servidor debe permitir pedidos desde otro origen (CORS); GitHub lo hace, y los cambios pueden tardar unos minutos por su caché.
+   Se configura en un archivo `.env` local o en las variables de entorno de Vercel:
+   ```
+   VITE_BANNERS_URL=https://raw.githubusercontent.com/USUARIO/REPO/main/banners.json
+   ```
+2. Si no existe, del archivo `public/banners.json` del proyecto (se edita y se vuelve a publicar).
+3. Si no se puede leer (sin conexión, JSON roto, etc.), se muestra una diapositiva de respaldo para que el banner nunca quede vacío.
+
+Cuando se incorpore Firebase, `getBanners()` se puede reemplazar por una consulta a Firestore sin tocar el componente.
+
+**Formato del JSON** (un objeto con un array `slides`; el orden del array es el orden del carrusel):
+
+| Campo | Obligatorio | Descripción |
+|-------|-------------|-------------|
+| `title` | Sí | Título de la diapositiva. |
+| `id` | No | Identificador único (si falta, se genera uno). |
+| `text` | No | Texto debajo del título. |
+| `buttonText` y `link` | No | Texto y destino del botón (se muestra si están los dos). `link` puede ser una ruta interna (`/category/hogar`), un ancla (`#catalogo`, baja al listado) o una URL `https://` externa. |
+| `image` y `imageAlt` | No | Imagen (ruta interna o `https://`) y su descripción para lectores de pantalla. |
+| `imageFit` | No | `contain` (por defecto): foto recortada, apoyada abajo a la derecha, como la del sitio. `cover`: foto completa que ocupa toda la mitad derecha. |
+| `theme` | No | Color de fondo: `lila` (por defecto), `amanecer` o `noche`. |
+| `active` | No | `false` para ocultarla sin borrarla. |
+| `from` y `to` | No | Período de vigencia (`AAAA-MM-DD`): la diapositiva aparece sola desde `from` y desaparece después de `to`. |
+
+```json
+{
+  "slides": [
+    {
+      "id": "novedad-vela",
+      "title": "Nueva vela de soja",
+      "text": "Ya disponible en todas las fragancias.",
+      "buttonText": "Ver hogar",
+      "link": "/category/hogar",
+      "image": "/productos/vela-soja-90g.jpg",
+      "imageAlt": "Vela de soja en lata",
+      "imageFit": "cover",
+      "theme": "amanecer",
+      "from": "2026-12-01",
+      "to": "2026-12-31"
+    }
+  ]
+}
+```
+
+Por seguridad, `getBanners()` valida lo que lee: descarta las diapositivas sin título, inactivas o fuera de su período, acepta como `link` solo rutas internas, anclas o `https://`
+(nunca `javascript:` ni `//otro-sitio`), y muestra como máximo 10 diapositivas.
+
+## Diseño responsive
+
+- **Pantallas de hasta 900 px (tablet y celular):** las categorías pasan a un menú hamburguesa y el Navbar queda en una sola fila (logo, carrito y botón del menú).
+- **Celulares (hasta 600 px):** la lista de productos usa 2 columnas con cards compactas (nombre en 2 líneas como máximo, precio y botón debajo), por lo que se ven **4 productos por pantalla**.
+- El banner conserva el diseño del sitio de la marca: texto a la izquierda y foto a la derecha en pantallas grandes; texto arriba y foto abajo en celulares.
 
 ## Datos y fotos
 
@@ -221,6 +297,9 @@ El diseño sigue el documento *Lila del Alba — Identidad mejorada* (sistema de
 
 ```
 public/
+├── banners.json          # diapositivas del carrusel (editable)
+├── banners/
+│   └── hero.webp         # foto de la primera diapositiva
 ├── productos/            # fotos de los productos (.jpg / .webp)
 ├── favicon.svg / .png    # ícono de la marca
 └── apple-touch-icon.png
@@ -230,6 +309,7 @@ src/
 │   ├── logo-horizontal-oscuro.svg
 │   └── logo-flor.svg
 ├── components/
+│   ├── Banner.jsx / .css
 │   ├── Cargando.jsx / .css
 │   ├── Cart.jsx / .css
 │   ├── CartWidget.jsx / .css
@@ -243,6 +323,7 @@ src/
 │   ├── Layout.jsx / .css
 │   ├── Navbar.jsx / .css
 │   ├── NotFound.jsx / .css
+│   ├── OptionPicker.jsx / .css
 │   └── ScrollToTop.jsx
 ├── context/
 │   └── CartContext.jsx   # CartContext, CartProvider y el hook useCart
@@ -250,8 +331,11 @@ src/
 │   ├── asyncMock.js      # getProducts y getProductById (Promises con retraso simulado)
 │   ├── categories.js     # categorías de la tienda
 │   └── products.js       # catálogo de productos
+├── services/
+│   └── banners.js        # getBanners: lee y valida las diapositivas del carrusel
 ├── utils/
-│   └── formatearPrecio.js
+│   ├── formatearPrecio.js
+│   └── precios.js        # calcularPrecios: descuento por pack x10
 ├── App.jsx               # BrowserRouter, CartProvider y definición de las rutas
 ├── index.css
 └── main.jsx              # punto de entrada

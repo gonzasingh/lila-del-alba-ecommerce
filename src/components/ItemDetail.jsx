@@ -1,19 +1,32 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import ItemCount from './ItemCount'
+import OptionPicker from './OptionPicker'
 import { useCart } from '../context/CartContext'
 import { getNombreCategoria } from '../mock/categories'
 import { formatearPrecio } from '../utils/formatearPrecio'
+import { UNIDADES_POR_PACK } from '../utils/precios'
 import './ItemDetail.css'
+
+// Todo lo que hay que elegir antes de agregar un producto: la fragancia (si tiene)
+// y sus opciones propias (color de la arcilla, tipo de cabello, color del bálsamo)
+const armarGrupos = ({ aromas = [], options = [] }) => [
+  ...(aromas.length > 0
+    ? [{ id: 'fragancia', label: 'Fragancia', title: 'Elegí la fragancia', choices: aromas }]
+    : []),
+  ...options,
+]
 
 // ItemDetail recibe un producto por props y muestra TODA su información.
 // No busca datos (eso lo hace ItemDetailContainer): lo único que toma del contexto
-// es el carrito, para agregar el producto con la cantidad que elija el cliente.
+// es el carrito, para agregar el producto con las opciones y la cantidad que elija el cliente.
 function ItemDetail({ product }) {
   const { addItem, getQuantity } = useCart()
 
-  // Cantidad que se acaba de agregar en esta visita (0 = todavía no agregó nada)
-  const [agregadas, setAgregadas] = useState(0)
+  // Lo elegido en cada grupo: { fragancia: 'Guayaba', arcilla: 'Café' }
+  const [elecciones, setElecciones] = useState({})
+  // Lo que se acaba de agregar en esta visita (null = todavía no agregó nada)
+  const [agregado, setAgregado] = useState(null)
 
   const {
     id,
@@ -27,20 +40,35 @@ function ItemDetail({ product }) {
     presentation,
     container,
     features = [],
-    aromas = [],
   } = product
 
-  // Lo que todavía se puede agregar: el stock menos lo que ya está en el carrito
+  const grupos = armarGrupos(product)
+  const faltantes = grupos.filter((grupo) => !elecciones[grupo.id])
+  const motivoBloqueo =
+    faltantes.length > 0
+      ? `Para agregar al carrito elegí: ${faltantes.map((g) => g.label.toLowerCase()).join(' y ')}.`
+      : ''
+
+  // Lo que todavía se puede agregar: el stock menos lo que ya está en el carrito (todas las variedades)
   const cantidadEnCarrito = getQuantity(id)
   const disponible = stock - cantidadEnCarrito
 
   const textoStock =
     stock === 0 ? 'Sin stock' : `Stock disponible: ${stock} ${stock === 1 ? 'unidad' : 'unidades'}`
 
+  const elegir = (grupoId, valor) =>
+    setElecciones((anteriores) => ({ ...anteriores, [grupoId]: valor }))
+
   // El cliente confirma la cantidad en ItemCount: se agrega al carrito (contexto)
   const handleAdd = (cantidad) => {
-    addItem(product, cantidad)
-    setAgregadas(cantidad)
+    const selection = grupos.map((grupo) => ({ label: grupo.label, value: elecciones[grupo.id] }))
+    addItem({ ...product, selection }, cantidad)
+    setAgregado({ cantidad, detalle: selection.map((eleccion) => eleccion.value).join(', ') })
+  }
+
+  const elegirOtraVariedad = () => {
+    setAgregado(null)
+    setElecciones({})
   }
 
   return (
@@ -59,6 +87,13 @@ function ItemDetail({ product }) {
             </p>
           )}
         </div>
+
+        {priceX10 && (
+          <p className="item-detail__pack-ayuda">
+            El precio de pack se aplica en el carrito por cada {UNIDADES_POR_PACK} unidades
+            exactamente iguales{grupos.length > 0 && ' (con las mismas opciones elegidas)'}.
+          </p>
+        )}
 
         <p className="item-detail__descripcion">{description}</p>
 
@@ -90,30 +125,40 @@ function ItemDetail({ product }) {
           </section>
         )}
 
-        {aromas.length > 0 && (
-          <section>
-            <h2 className="item-detail__subtitulo">Aromas disponibles</h2>
-            <ul className="item-detail__aromas">
-              {aromas.map((aroma) => (
-                <li key={aroma}>{aroma}</li>
-              ))}
-            </ul>
-          </section>
-        )}
-
         <div className="item-detail__compra">
+          {/* Las opciones se eligen antes de agregar al carrito */}
+          {!agregado &&
+            disponible > 0 &&
+            grupos.map((grupo) => (
+              <OptionPicker
+                key={grupo.id}
+                legend={grupo.title}
+                name={grupo.id}
+                options={grupo.choices.map((opcion) => ({ value: opcion, label: opcion }))}
+                value={elecciones[grupo.id] ?? ''}
+                onChange={(valor) => elegir(grupo.id, valor)}
+              />
+            ))}
+
           <p className="item-detail__stock">{textoStock}</p>
 
-          {agregadas > 0 ? (
+          {agregado ? (
             // Ya agregó: el botón "Agregar" se reemplaza por "Terminar mi compra" (lleva a /cart)
             <>
               <p className="item-detail__confirmacion" role="status">
-                ¡Listo! Agregaste {agregadas} {agregadas === 1 ? 'unidad' : 'unidades'} al carrito.
+                ¡Listo! Agregaste {agregado.cantidad}{' '}
+                {agregado.cantidad === 1 ? 'unidad' : 'unidades'} al carrito
+                {agregado.detalle && `: ${agregado.detalle}`}.
               </p>
               <div className="item-detail__acciones">
                 <Link className="item-detail__terminar" to="/cart">
                   Terminar mi compra
                 </Link>
+                {grupos.length > 0 && disponible > 0 && (
+                  <button type="button" className="item-detail__seguir" onClick={elegirOtraVariedad}>
+                    Agregar otra variedad
+                  </button>
+                )}
                 <Link className="item-detail__seguir" to="/">
                   Seguir comprando
                 </Link>
@@ -122,7 +167,7 @@ function ItemDetail({ product }) {
           ) : (
             <>
               {disponible > 0 ? (
-                <ItemCount stock={disponible} onAdd={handleAdd} />
+                <ItemCount stock={disponible} onAdd={handleAdd} motivoBloqueo={motivoBloqueo} />
               ) : (
                 stock > 0 && (
                   <p className="item-detail__confirmacion">

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { getProducts } from '../mock/asyncMock'
 import { CATEGORIAS, getNombreCategoria } from '../mock/categories'
+import Banner from './Banner'
 import ItemList from './ItemList'
 import Cargando from './Cargando'
 import NotFound from './NotFound'
@@ -53,9 +54,20 @@ function ItemListContainer({ greeting }) {
 
   return (
     <main className="item-list-container">
-      <h1 className="item-list-container__saludo">
-        {categoryId ? getNombreCategoria(categoryId) : greeting}
-      </h1>
+      {/* El carrusel de novedades y promociones solo se muestra en el inicio */}
+      {!categoryId && <Banner />}
+
+      {/* id="catalogo": destino del ancla "#catalogo" que usan los botones del banner */}
+      <div className="item-list-container__encabezado" id="catalogo">
+        <h1 className="item-list-container__titulo">
+          {categoryId ? getNombreCategoria(categoryId) : greeting}
+        </h1>
+        {!cargando && !error && (
+          <p className="item-list-container__cantidad">
+            {items.length} {items.length === 1 ? 'producto' : 'productos'}
+          </p>
+        )}
+      </div>
 
       {cargando && <Cargando mensaje="Cargando productos..." />}
 

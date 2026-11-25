@@ -15,7 +15,7 @@ function App() {
           {/* Rutas anidadas: todas se dibujan dentro del Layout (Navbar + Footer) */}
           <Route element={<Layout />}>
             {/* Inicio (/): todo el catálogo */}
-            <Route index element={<ItemListContainer greeting="¡Bienvenidos a Lila del Alba!" />} />
+            <Route index element={<ItemListContainer greeting="Todos los productos" />} />
             {/* Categoría: el listado se filtra con el :id de la URL */}
             <Route path="/category/:id" element={<ItemListContainer />} />
             {/* Detalle: el :id de la URL es el id del producto */}

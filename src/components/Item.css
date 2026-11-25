@@ -81,3 +81,52 @@
   background-color: var(--violeta);
   color: var(--blanco);
 }
+
+/* Celular: card compacta para que entren 4 por pantalla (grilla de 2 columnas) */
+@media (max-width: 600px) {
+  .item {
+    border-radius: 16px;
+  }
+
+  .item:hover {
+    transform: none;
+  }
+
+  .item__cuerpo {
+    gap: 0.15rem;
+    padding: 0.6rem 0.7rem 0.75rem;
+  }
+
+  .item__categoria {
+    font-size: 0.68rem;
+  }
+
+  /* Nombre en 2 líneas como máximo: todas las cards miden lo mismo */
+  .item__nombre {
+    display: -webkit-box;
+    min-height: 2.4em;
+    overflow: hidden;
+    font-size: 0.95rem;
+    line-height: 1.2;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .item__pie {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.4rem;
+    padding-top: 0.35rem;
+  }
+
+  .item__precio {
+    font-size: 1.1rem;
+  }
+
+  .item__boton {
+    padding: 0.45rem 0.5rem;
+    font-size: 0.85rem;
+    text-align: center;
+  }
+}

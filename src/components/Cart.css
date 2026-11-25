@@ -116,6 +116,31 @@
   text-decoration: underline;
 }
 
+.cart__fragancia {
+  margin: 0.25rem 0 0;
+  font-size: 0.92rem;
+  color: var(--texto-suave);
+}
+
+/* Precio de lista tachado cuando hay descuento */
+.cart__antes {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--texto-suave);
+}
+
+.cart__pack {
+  display: inline-block;
+  margin: 0.6rem 0 0;
+  padding: 0.3rem 0.75rem;
+  border-radius: 12px;
+  background-color: var(--amanecer-suave);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--noche);
+}
+
 /* Precio unitario, cantidad y subtotal, cada uno con su etiqueta */
 .cart__cifras {
   display: flex;
@@ -181,8 +206,16 @@
 }
 
 .cart__resumen-fila {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
   margin: 0;
   color: var(--texto-suave);
+}
+
+.cart__resumen-fila--descuento {
+  font-weight: 700;
+  color: var(--violeta);
 }
 
 .cart__total {

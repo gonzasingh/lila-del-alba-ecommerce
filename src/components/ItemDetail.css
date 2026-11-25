@@ -102,18 +102,10 @@
   color: var(--lila);
 }
 
-.item-detail__aromas {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-}
-
-.item-detail__aromas li {
-  padding: 0.25rem 0.8rem;
-  border-radius: 999px;
-  background-color: var(--lila-suave);
+.item-detail__pack-ayuda {
+  margin: -0.6rem 0 0;
   font-size: 0.88rem;
-  color: var(--violeta);
+  color: var(--texto-suave);
 }
 
 .item-detail__compra {
@@ -179,7 +171,9 @@
 
 .item-detail__seguir {
   border: 1.5px solid var(--violeta);
+  background-color: transparent;
   color: var(--violeta);
+  cursor: pointer;
 }
 
 .item-detail__seguir:hover {

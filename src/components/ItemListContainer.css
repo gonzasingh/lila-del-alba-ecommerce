@@ -1,27 +1,28 @@
 .item-list-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 3rem 1.5rem 4rem;
+  padding: 1.5rem 1.5rem 4rem;
 }
 
-.item-list-container__saludo {
-  margin: 0 0 2.75rem;
-  text-align: center;
+/* Título de la lista y cantidad de productos */
+.item-list-container__encabezado {
+  margin: 0 0 1.5rem;
+  /* Deja lugar para la barra fija cuando se llega con el ancla "#catalogo" */
+  scroll-margin-top: 90px;
+}
+
+.item-list-container__titulo {
+  margin: 0;
   font-family: var(--fuente-titulos);
-  font-size: clamp(1.8rem, 5vw, 3rem);
+  font-size: clamp(1.7rem, 4vw, 2.2rem);
+  font-weight: 700;
   line-height: 1.2;
   color: var(--violeta);
 }
 
-/* Trazo "amanecer" bajo el título: recuerda al arco del logo */
-.item-list-container__saludo::after {
-  content: '';
-  display: block;
-  width: 72px;
-  height: 5px;
-  margin: 0.9rem auto 0;
-  border-radius: 999px;
-  background-color: var(--amanecer);
+.item-list-container__cantidad {
+  margin: 0.2rem 0 0;
+  color: var(--texto-suave);
 }
 
 .item-list-container__error {
@@ -29,4 +30,14 @@
   text-align: center;
   font-size: 1.05rem;
   color: var(--violeta);
+}
+
+@media (max-width: 600px) {
+  .item-list-container {
+    padding: 1rem 1rem 3rem;
+  }
+
+  .item-list-container__encabezado {
+    margin-bottom: 1rem;
+  }
 }

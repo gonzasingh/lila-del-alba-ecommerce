@@ -8,6 +8,7 @@
 //   container    tipo de envase                              (solo en el detalle)
 //   features     características                             (solo en el detalle)
 //   aromas       aromas disponibles                          (solo en el detalle)
+//   options      otras elecciones obligatorias antes de comprar (arcilla, tipo de cabello, color)
 // Los ids son strings: así coinciden con los parámetros de una URL cuando se sumen las rutas.
 
 // ---- Aromas según la lista de fragancias ----
@@ -33,8 +34,8 @@ const AROMAS_CUIDADO_BASE = [
   'Cerezo en flor',
 ]
 
-// Aceite corporal, shampoo y acondicionador
-const AROMAS_ACEITE_SHAMPOO = AROMAS_CUIDADO_BASE
+// Aceite corporal (shampoo y acondicionador no llevan elección de fragancia)
+const AROMAS_ACEITE = AROMAS_CUIDADO_BASE
 // Jabón: suma Mora roja & Jabuticaba
 const AROMAS_JABON = [...AROMAS_CUIDADO_BASE, 'Mora roja & Jabuticaba']
 // Crema corporal y body splash: suman Açaí y Mora roja & Jabuticaba
@@ -50,6 +51,26 @@ const AROMAS_HOGAR = [
   'Cerezo en flor',
   'Mora roja & Jabuticaba',
 ]
+
+// ---- Opciones que se eligen (además de la fragancia) antes de agregar al carrito ----
+const OPCION_ARCILLA = {
+  id: 'arcilla',
+  label: 'Arcilla',
+  title: 'Elegí el color de la arcilla',
+  choices: ['Blanca', 'Café'],
+}
+const OPCION_CABELLO = {
+  id: 'cabello',
+  label: 'Tipo de cabello',
+  title: 'Elegí el tipo de cabello',
+  choices: ['Caída de cabello', 'Cabello seco', 'Cabello graso'],
+}
+const OPCION_COLOR = {
+  id: 'color',
+  label: 'Color',
+  title: '¿Con o sin color?',
+  choices: ['Con color', 'Sin color'],
+}
 
 export const products = [
   // ---------- Jabones ----------
@@ -73,6 +94,7 @@ export const products = [
     category: 'jabones',
     img: '/productos/jabon-avena-carbon.jpg',
     stock: 32,
+    options: [OPCION_ARCILLA],
     description:
       'Jabón exfoliante masajeador que suma arcilla a la base de avena o carbón activado. Se presenta sin aroma.',
     features: ['Con avena coloidal / carbón activado', 'Con arcilla blanca / café', 'Sin aroma'],
@@ -98,6 +120,7 @@ export const products = [
     category: 'jabones',
     img: '/productos/jabon-avena-carbon-arcilla-aroma.jpg',
     stock: 5,
+    options: [OPCION_ARCILLA],
     description:
       'Nuestro jabón exfoliante más completo: base de avena o carbón activado, arcilla y el aroma que prefieras.',
     features: [
@@ -164,7 +187,7 @@ export const products = [
       'Aceite corporal con almendras, karité, jojoba y vitamina E, con el aroma que elijas.',
     presentation: '50 cc',
     features: ['Con almendras, karité, jojoba y vitamina E', 'Aroma a elección'],
-    aromas: AROMAS_ACEITE_SHAMPOO,
+    aromas: AROMAS_ACEITE,
   },
   {
     id: '9',
@@ -191,7 +214,7 @@ export const products = [
       'Aceite corporal con almendras, karité, jojoba y vitamina E en formato de 100 cc, con el aroma que elijas.',
     presentation: '100 cc',
     features: ['Con almendras, karité, jojoba y vitamina E', 'Aroma a elección'],
-    aromas: AROMAS_ACEITE_SHAMPOO,
+    aromas: AROMAS_ACEITE,
   },
 
   // ---------- Sérum ----------
@@ -233,6 +256,7 @@ export const products = [
     category: 'balsamo',
     img: '/productos/balsamo-labial-5cc.jpg',
     stock: 36,
+    options: [OPCION_COLOR],
     description: 'Bálsamo labial en envase plástico, práctico para llevar siempre encima.',
     presentation: '5 cc',
     container: 'Plástico',
@@ -246,6 +270,7 @@ export const products = [
     category: 'balsamo',
     img: '/productos/balsamo-labial-10cc.jpg',
     stock: 25,
+    options: [OPCION_COLOR],
     description: 'Bálsamo labial en lata metálica, con más contenido para uso frecuente.',
     presentation: '10 cc',
     container: 'Metálico',
@@ -261,10 +286,10 @@ export const products = [
     category: 'ducha',
     img: '/productos/shampoo-solido.webp',
     stock: 20,
+    options: [OPCION_CABELLO],
     description:
       'Shampoo en barra, sin envase plástico. Disponible para la caída de cabello, para cabello seco o para cabello graso.',
     features: ['Para la caída de cabello / cabello seco / graso'],
-    aromas: AROMAS_ACEITE_SHAMPOO,
   },
   {
     id: '16',
@@ -277,7 +302,6 @@ export const products = [
     description:
       'Acondicionador en barra, humectante y sin TACC. Complementa al shampoo sólido en la rutina de ducha.',
     features: ['Sin TACC', 'Humectante'],
-    aromas: AROMAS_ACEITE_SHAMPOO,
   },
   {
     id: '17',

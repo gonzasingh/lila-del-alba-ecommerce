@@ -1,0 +1,283 @@
+/* ---------- Carrusel de novedades y promociones ---------- */
+.banner {
+  margin-bottom: 2.5rem;
+}
+
+/* Espacio reservado mientras se cargan las diapositivas */
+.banner--cargando {
+  min-height: 430px;
+  border-radius: 32px;
+  background-color: var(--lila-suave);
+  opacity: 0.6;
+}
+
+/* Todas las diapositivas comparten la misma celda: el alto es el de la más alta */
+.banner__slides {
+  display: grid;
+  overflow: hidden;
+  border-radius: 32px;
+  touch-action: pan-y; /* el scroll vertical sigue funcionando; el horizontal lo maneja el carrusel */
+}
+
+.banner__slide {
+  grid-area: 1 / 1;
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  align-items: end;
+  gap: 24px;
+  padding: 40px 40px 0;
+  opacity: 0;
+  visibility: hidden;
+  /* La diapositiva que sale se queda opaca debajo mientras la nueva aparece encima (sin destellos) */
+  transition: opacity 0s linear 0.6s, visibility 0s linear 0.6s;
+}
+
+.banner__slide--activa {
+  z-index: 1;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.6s ease, visibility 0s;
+}
+
+/* ---------- Temas (colores de la marca) ---------- */
+.banner__slide--lila,
+.banner__slide--amanecer {
+  --banner-titulo: var(--violeta);
+  --banner-texto: var(--noche);
+  --banner-boton: var(--violeta);
+  --banner-boton-texto: var(--blanco);
+  --banner-boton-hover: var(--noche);
+}
+
+.banner__slide--lila {
+  background-color: var(--lila-suave);
+}
+
+.banner__slide--amanecer {
+  background-color: var(--amanecer-suave);
+}
+
+.banner__slide--noche {
+  --banner-titulo: var(--blanco);
+  --banner-texto: var(--bruma);
+  --banner-boton: var(--amanecer);
+  --banner-boton-texto: var(--noche);
+  --banner-boton-hover: var(--blanco);
+  background-color: var(--noche);
+}
+
+.banner__slide--noche :focus-visible {
+  outline-color: var(--lila);
+}
+
+/* ---------- Texto ---------- */
+.banner__texto {
+  align-self: center;
+  padding-bottom: 40px;
+}
+
+.banner__titulo {
+  max-width: 16ch;
+  margin: 0 0 14px;
+  font-size: clamp(2.1rem, 4.8vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--banner-titulo);
+}
+
+.banner__descripcion {
+  max-width: 44ch;
+  margin: 0 0 24px;
+  line-height: 1.5;
+  color: var(--banner-texto);
+}
+
+.banner__boton {
+  display: inline-block;
+  padding: 11px 22px;
+  border-radius: 999px;
+  background-color: var(--banner-boton);
+  font-weight: 600;
+  color: var(--banner-boton-texto);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.banner__boton:hover {
+  background-color: var(--banner-boton-hover);
+  color: var(--blanco);
+}
+
+.banner__slide--noche .banner__boton:hover {
+  color: var(--noche);
+}
+
+/* ---------- Imagen ---------- */
+/* Foto recortada (sin fondo): apoyada abajo a la derecha, como en el sitio de la marca */
+.banner__imagen {
+  display: block;
+  width: 100%;
+  max-width: 340px;
+  max-height: 430px;
+  margin-left: auto;
+  object-fit: contain;
+  object-position: center bottom;
+  user-select: none;
+}
+
+/* Foto completa: ocupa toda la mitad derecha de la diapositiva */
+.banner__slide--foto {
+  align-items: stretch;
+  padding: 0;
+}
+
+.banner__slide--foto .banner__texto {
+  padding: 40px 0 40px 40px;
+}
+
+.banner__slide--foto .banner__imagen {
+  max-width: none;
+  max-height: none;
+  height: 100%;
+  min-height: 280px;
+  margin: 0;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Sin imagen: el texto ocupa todo el ancho */
+.banner__slide--solo-texto {
+  grid-template-columns: 1fr;
+  padding-bottom: 0;
+}
+
+/* ---------- Controles ---------- */
+.banner__controles {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+}
+
+.banner__flecha {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--borde);
+  border-radius: 50%;
+  background-color: var(--blanco);
+  color: var(--violeta);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.banner__flecha:hover {
+  background-color: var(--violeta);
+  color: var(--blanco);
+}
+
+.banner__flecha svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.banner__flecha svg .banner__relleno {
+  fill: currentColor;
+  stroke: none;
+}
+
+.banner__pausa {
+  margin-left: 0.5rem;
+}
+
+.banner__puntos {
+  display: flex;
+  align-items: center;
+}
+
+/* Cada punto tiene un área táctil de 28 px aunque se dibuje más chico */
+.banner__punto {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.banner__punto::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background-color: var(--lila);
+  transition: width 0.25s ease, background-color 0.25s ease;
+}
+
+.banner__punto[aria-current='true']::before {
+  width: 26px;
+  background-color: var(--violeta);
+}
+
+/* ---------- Pantallas chicas ---------- */
+@media (max-width: 720px) {
+  .banner {
+    margin-bottom: 1.5rem;
+  }
+
+  .banner--cargando {
+    min-height: 520px;
+  }
+
+  .banner__slides,
+  .banner--cargando {
+    border-radius: 28px;
+  }
+
+  .banner__slide {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 16px;
+    padding: 28px 24px 0;
+  }
+
+  .banner__texto {
+    padding-bottom: 0;
+  }
+
+  .banner__titulo {
+    max-width: none;
+    font-size: clamp(1.8rem, 8vw, 2.2rem);
+  }
+
+  .banner__imagen {
+    max-width: 220px;
+    max-height: 260px;
+    margin: 0 auto;
+  }
+
+  /* Foto completa: debajo del texto, de borde a borde y rellenando el alto restante */
+  .banner__slide--foto {
+    grid-template-rows: auto 1fr;
+    gap: 0;
+    padding: 0;
+  }
+
+  .banner__slide--foto .banner__texto {
+    padding: 28px 24px 20px;
+  }
+
+  .banner__slide--foto .banner__imagen {
+    min-height: 200px;
+  }
+}

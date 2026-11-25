@@ -8,13 +8,17 @@ import './Cart.css'
 // Vista del carrito (ruta /cart): lista los productos agregados, permite quitarlos
 // de a uno o vaciar todo, y muestra el total antes de decidir la compra.
 function Cart() {
-  const { cart, removeItem, clear, totalItems, totalPrice } = useCart()
+  // lines: cada línea del carrito con su precio ya calculado (incluye el descuento por pack x10)
+  const { lines, removeItem, clear, totalItems, subtotal, discount, totalPrice } = useCart()
 
   // "Finalizar compra" es un placeholder: el checkout real llega en el módulo de Firebase
   const [avisoCheckout, setAvisoCheckout] = useState(false)
 
+  // Productos distintos (un mismo producto puede ocupar varias líneas, una por variedad)
+  const totalProductos = new Set(lines.map((linea) => linea.id)).size
+
   // Carrito vacío: mensaje y link para volver al catálogo
-  if (cart.length === 0) {
+  if (lines.length === 0) {
     return (
       <main className="cart cart--vacio">
         <img className="cart__flor" src={logoFlor} alt="" />
@@ -36,14 +40,20 @@ function Cart() {
 
       <div className="cart__contenido">
         <ul className="cart__lista">
-          {cart.map((item) => (
-            <li key={item.id} className="cart__item">
+          {lines.map((item) => (
+            <li key={item.lineId} className="cart__item">
               <img className="cart__imagen" src={item.img} alt="" />
 
               <div className="cart__datos">
                 <Link className="cart__nombre" to={`/item/${item.id}`}>
                   {item.name}
                 </Link>
+
+                {item.selection.map((eleccion) => (
+                  <p key={eleccion.label} className="cart__fragancia">
+                    {eleccion.label}: {eleccion.value}
+                  </p>
+                ))}
 
                 <dl className="cart__cifras">
                   <div>
@@ -56,16 +66,33 @@ function Cart() {
                   </div>
                   <div>
                     <dt>Subtotal</dt>
-                    <dd className="cart__subtotal">{formatearPrecio(item.price * item.quantity)}</dd>
+                    <dd className="cart__subtotal">
+                      {item.unidadesPack > 0 && (
+                        <del className="cart__antes">
+                          <span className="sr-only">Antes </span>
+                          {formatearPrecio(item.subtotalSinDescuento)}
+                        </del>
+                      )}
+                      {formatearPrecio(item.subtotal)}
+                    </dd>
                   </div>
                 </dl>
+
+                {/* Desglose cuando se aplicó el pack: cuántas con descuento y cuántas a precio normal */}
+                {item.unidadesPack > 0 && (
+                  <p className="cart__pack">
+                    Pack x10: {item.unidadesPack} × {formatearPrecio(item.priceX10)}
+                    {item.unidadesNormales > 0 &&
+                      ` + ${item.unidadesNormales} × ${formatearPrecio(item.price)} (precio normal)`}
+                  </p>
+                )}
               </div>
 
               <button
                 type="button"
                 className="cart__eliminar"
-                onClick={() => removeItem(item.id)}
-                aria-label={`Eliminar ${item.name} del carrito`}
+                onClick={() => removeItem(item.id, item.lineId)}
+                aria-label={`Eliminar ${[item.name, ...item.selection.map((e) => e.value)].join(', ')} del carrito`}
               >
                 Eliminar
               </button>
@@ -78,10 +105,23 @@ function Cart() {
 
           <p className="cart__resumen-fila">
             <span>
-              {totalItems} {totalItems === 1 ? 'unidad' : 'unidades'} ({cart.length}{' '}
-              {cart.length === 1 ? 'producto' : 'productos'})
+              {totalItems} {totalItems === 1 ? 'unidad' : 'unidades'} ({totalProductos}{' '}
+              {totalProductos === 1 ? 'producto' : 'productos'})
             </span>
           </p>
+
+          {discount > 0 && (
+            <>
+              <p className="cart__resumen-fila">
+                <span>Subtotal</span>
+                <span>{formatearPrecio(subtotal)}</span>
+              </p>
+              <p className="cart__resumen-fila cart__resumen-fila--descuento">
+                <span>Descuento pack x10</span>
+                <span>− {formatearPrecio(discount)}</span>
+              </p>
+            </>
+          )}
 
           <p className="cart__total">
             <span>Total</span>

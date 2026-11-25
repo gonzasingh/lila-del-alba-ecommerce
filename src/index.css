@@ -15,8 +15,9 @@
   --texto-suave: color-mix(in srgb, var(--noche) 72%, white);
 
   /* ---- Tipografía, bordes y sombras ---- */
-  --fuente-titulos: Georgia, 'Times New Roman', serif;
-  --fuente-texto: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  /* Outfit se carga desde Google Fonts en index.html (igual que el sitio de la marca) */
+  --fuente-texto: 'Outfit', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --fuente-titulos: var(--fuente-texto);
   --radio: 20px;
   --sombra: 0 8px 24px rgba(59, 43, 115, 0.12);
 }
@@ -32,6 +33,14 @@ body {
   color: var(--texto);
 }
 
+/* Los botones y campos no heredan la fuente por defecto */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -45,6 +54,19 @@ ul {
 
 img {
   max-width: 100%;
+}
+
+/* Texto solo para lectores de pantalla */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* Foco visible para quien navega con teclado: violeta sobre fondos claros */
