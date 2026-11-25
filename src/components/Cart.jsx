@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import CheckoutForm from './CheckoutForm'
 import { useCart } from '../context/CartContext'
 import { firebaseConfigured } from '../services/firebase'
-import { crearOrden, SinStockError } from '../services/orders'
+import { BaseAjenaError, crearOrden, SinStockError } from '../services/orders'
 import { formatearPrecio } from '../utils/formatearPrecio'
 import logoFlor from '../assets/logo-flor.svg'
 import './Cart.css'
@@ -38,13 +38,14 @@ function Cart() {
       setOrden({ id, total: totalPrice })
       clear()
     } catch (error) {
-      setErrorOrden(
-        error instanceof SinStockError
-          ? `No hay stock suficiente de ${error.faltantes
-              .map((f) => `${f.name} (quedan ${f.disponible})`)
-              .join(', ')}.`
-          : 'No pudimos generar la orden. Intentá de nuevo en unos minutos.',
-      )
+      if (error instanceof SinStockError) {
+        const detalle = error.faltantes.map((f) => `${f.name} (quedan ${f.disponible})`).join(', ')
+        setErrorOrden(`No hay stock suficiente de ${detalle}.`)
+      } else if (error instanceof BaseAjenaError) {
+        setErrorOrden('La compra online todavía no está disponible con esta base de datos.')
+      } else {
+        setErrorOrden('No pudimos generar la orden. Intentá de nuevo en unos minutos.')
+      }
     } finally {
       setEnviando(false)
     }

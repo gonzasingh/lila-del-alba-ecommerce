@@ -88,10 +88,11 @@ Todos los componentes viven en `src/components`, cada uno con su archivo `.jsx` 
 | Componente | Descripción |
 |------------|-------------|
 | `Layout` | Estructura compartida por todas las rutas: `Navbar`, `Footer` y un `<Outlet />` donde se dibuja la página de la ruta actual. También incluye `ScrollToTop`. |
-| `Navbar` | Barra de navegación fija en la parte superior. Muestra el logo horizontal de la marca, las categorías de productos (generadas con `map` a partir de `src/mock/categories.js`) como `NavLink` a `/category/:categoryId`, y el `CartWidget`. En pantallas de hasta 900 px las categorías pasan a un **menú desplegable tipo hamburguesa**: se abre y cierra con el botón (`aria-expanded`), se cierra al elegir una categoría, con la tecla Escape o al tocar fuera de la barra. |
+| `Navbar` | Barra de navegación fija en la parte superior: arriba de todo se ve **integrada en la página** (transparente) y al bajar más de 24 px se convierte en una **píldora de vidrio translúcido** y redondeada (estilo liquid glass). Muestra el logo horizontal de la marca, las categorías de productos (generadas con `map` a partir de `src/mock/categories.js`) como `NavLink` a `/category/:categoryId`, y el `CartWidget`. En pantallas de hasta 900 px las categorías pasan a un **menú desplegable tipo hamburguesa**: se abre y cierra con el botón (`aria-expanded`), se cierra al elegir una categoría, con la tecla Escape o al tocar fuera de la barra. |
 | `Banner` | Carrusel de novedades y promociones de la home. Lee sus diapositivas de un JSON editable (ver más abajo), avanza solo cada 6 segundos, se pausa con el mouse encima, con el foco o con el botón de pausa, y se puede recorrer con las flechas, los puntos, deslizando con el dedo o con las teclas ← →. |
 | `CartWidget` | Link a `/cart` con el ícono y un círculo con la cantidad total de unidades (`totalItems`, que lee del contexto con `useCart`). Con el carrito vacío no muestra el número. |
-| `ItemListContainer` | Contenedor del catálogo. Lee el `id` de la URL (`/category/:id`), obtiene los productos con `getProducts(categoryId)` dentro de un `useEffect`, los guarda en el estado `items` y se los pasa por props a `ItemList`. Maneja los estados de carga y de error. En la home (`/`) muestra el `Banner` arriba; en todas las rutas muestra el título y la cantidad de productos. No hace el `.map()`. |
+| `ItemListContainer` | Contenedor del catálogo. Lee el `id` de la URL (`/category/:id`), obtiene los productos con `getProducts(categoryId)` dentro de un `useEffect`, los guarda en el estado `items` y se los pasa por props a `ItemList`. Maneja los estados de carga y de error. En la home (`/`) muestra el `Banner` arriba; en todas las rutas muestra el título, la cantidad de productos, el buscador y el orden (`ProductToolbar`). No hace el `.map()`. |
+| `ProductToolbar` | Buscador y selector de orden (orden de la lista, precio de menor a mayor o de mayor a menor). La búsqueda mira nombre, descripción y presentación, sin distinguir mayúsculas ni tildes; sin coincidencias se ofrece "Limpiar búsqueda". La lógica está en `utils/filtrarProductos.js`. |
 | `ItemList` | Recibe los productos por props (`items`), los recorre con `.map()` y renderiza un `Item` por cada uno, usando el `id` del producto como `key`. En celulares (hasta 600 px) la grilla pasa a **2 columnas**, de modo que en cada pantalla se ven 4 productos (2 filas de 2). |
 | `Item` | Card con la información **resumida** de un producto (imagen, categoría, nombre y precio) y un link "Ver detalle" a `/item/:id`. |
 | `ItemDetailContainer` | Contenedor del detalle. Lee el `id` de la URL (`/item/:id`), ejecuta `getProductById` dentro de un `useEffect`, guarda el producto en el estado `product` y se lo entrega por props a `ItemDetail`. No contiene el diseño del producto ni toca el carrito. |
@@ -221,10 +222,17 @@ El carrito vive en memoria, por lo que se vacía al recargar la página.
 **Compra:** `crearOrden` usa una **transacción**: lee el stock actual, y solo si alcanza descuenta las unidades y guarda la orden. Si no alcanza, no cambia nada
 y se informa qué producto falta.
 
-### Puesta en marcha
+### Si la base es la del sitio ya publicado
+
+La tienda puede **leer** el catálogo de un proyecto que ya usa otra versión del sitio (campo `image` y opciones `{ label, values }`): `services/products.js`
+convierte los datos al leerlos, sin modificar la base. En ese caso **la compra queda desactivada** (`crearOrden` no escribe nada si los productos no tienen
+el campo `img` que carga `npm run seed`), y el banner usa `banners.json` si las reglas no permiten leer `banners`.
+**No publiques `firestore.rules` ni cargues datos en ese proyecto**: reemplazaría sus reglas y su sitio dejaría de funcionar.
+
+### Puesta en marcha (proyecto de Firebase nuevo, exclusivo de esta tienda)
 
 1. En la [consola de Firebase](https://console.firebase.google.com/) elegí tu proyecto, creá **Firestore Database** y registrá una **app web**.
-2. Copiá `.env.example` como `.env.local` y completá los valores de la configuración de esa app.
+2. Copiá `.env.example` como `.env` y completá los valores de la configuración de esa app.
 3. Con las reglas en **modo de prueba** (permiten escribir), cargá los datos: `npm run seed`.
 4. Publicá las reglas de `firestore.rules` (Firestore Database → Reglas → pegar → Publicar). **No dejes el modo de prueba.**
 5. Reiniciá `npm run dev`. En Vercel, cargá las mismas variables en *Environment Variables* y volvé a desplegar.
@@ -359,6 +367,7 @@ src/
 │   ├── Navbar.jsx / .css
 │   ├── NotFound.jsx / .css
 │   ├── OptionPicker.jsx / .css
+│   ├── ProductToolbar.jsx / .css
 │   └── ScrollToTop.jsx
 ├── context/
 │   └── CartContext.jsx   # CartContext, CartProvider y el hook useCart
@@ -372,6 +381,7 @@ src/
 │   ├── orders.js         # crearOrden: orden + descuento de stock
 │   └── products.js       # getProducts y getProductById (Firestore o mock)
 ├── utils/
+│   ├── filtrarProductos.js  # búsqueda y orden de la lista
 │   ├── formatearPrecio.js
 │   └── precios.js        # calcularPrecios: descuento por pack x10
 ├── App.jsx               # BrowserRouter, CartProvider y definición de las rutas

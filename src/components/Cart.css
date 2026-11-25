@@ -282,7 +282,7 @@
   /* El resumen acompaña al scroll mientras se revisa la lista */
   .cart__resumen {
     position: sticky;
-    top: 96px;
+    top: calc(var(--alto-navbar) + 12px);
   }
 
   /* Con el formulario abierto es alto: se deja quieto para poder verlo completo */

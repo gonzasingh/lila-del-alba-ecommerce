@@ -1,5 +1,9 @@
 // Reglas de seguridad de Firestore para la tienda.
 // Se publican desde la consola de Firebase: Firestore Database → Reglas → pegar y "Publicar".
+//
+// ¡ATENCIÓN! Son SOLO para un proyecto de Firebase nuevo y exclusivo de esta tienda.
+// NO publicarlas en un proyecto que ya use otra aplicación (por ejemplo el del sitio publicado):
+// reemplazan todas sus reglas y ese sitio dejaría de funcionar.
 rules_version = '2';
 
 service cloud.firestore {

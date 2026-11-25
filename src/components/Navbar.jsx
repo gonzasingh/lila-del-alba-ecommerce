@@ -8,9 +8,27 @@ import './Navbar.css'
 function Navbar() {
   // En pantallas chicas las categorías están en un menú desplegable (hamburguesa)
   const [menuAbierto, setMenuAbierto] = useState(false)
+  // true cuando se bajó en la página: la barra pasa de integrada a "vidrio" flotante
+  const [desplazado, setDesplazado] = useState(false)
   const botonRef = useRef(null)
 
   const cerrarMenu = () => setMenuAbierto(false)
+
+  useEffect(() => {
+    const alDesplazar = () => setDesplazado(window.scrollY > 24)
+
+    alDesplazar() // por si la página se recarga estando abajo
+    window.addEventListener('scroll', alDesplazar, { passive: true })
+    return () => window.removeEventListener('scroll', alDesplazar)
+  }, [])
+
+  const claseBarra = [
+    'navbar',
+    desplazado || menuAbierto ? 'navbar--vidrio' : '',
+    menuAbierto ? 'navbar--menu' : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
 
   // Con el menú abierto: Escape o un toque fuera de la barra lo cierran
   useEffect(() => {
@@ -39,7 +57,7 @@ function Navbar() {
     isActive ? 'navbar__enlace navbar__enlace--activo' : 'navbar__enlace'
 
   return (
-    <header className="navbar">
+    <header className={claseBarra}>
       <div className="navbar__contenido">
         {/* El logo horizontal ya incluye la flor y el nombre de la marca */}
         <Link

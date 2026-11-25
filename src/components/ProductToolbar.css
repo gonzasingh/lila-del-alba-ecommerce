@@ -1,0 +1,42 @@
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.toolbar__grupo {
+  display: block;
+}
+
+.toolbar__campo {
+  width: 100%;
+  min-height: 48px;
+  padding: 11px 16px;
+  border: 2px solid var(--borde);
+  border-radius: 16px;
+  background-color: var(--blanco);
+  font-size: 1rem; /* menos de 16 px hace que iOS agrande la página al escribir */
+  color: var(--noche);
+}
+
+.toolbar__campo--buscar {
+  min-width: 280px;
+}
+
+.toolbar__campo:focus-visible {
+  border-color: var(--violeta);
+  outline: 3px solid var(--lila-suave);
+  outline-offset: 0;
+}
+
+/* Celular: buscador y orden, uno debajo del otro a todo el ancho */
+@media (max-width: 560px) {
+  .toolbar,
+  .toolbar__grupo {
+    width: 100%;
+  }
+
+  .toolbar__campo--buscar {
+    min-width: 0;
+  }
+}

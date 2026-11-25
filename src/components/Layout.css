@@ -2,6 +2,8 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  /* El Navbar es fijo: se reserva su alto para que no tape el comienzo de cada página */
+  padding-top: var(--alto-navbar);
 }
 
 /* Cada página es un <main>: ocupa el espacio libre para que el footer quede al final de la pantalla */

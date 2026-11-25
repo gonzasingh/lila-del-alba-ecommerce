@@ -244,8 +244,10 @@
     border-radius: 28px;
   }
 
+  /* La segunda fila (la foto) ocupa todo el alto que sobra */
   .banner__slide {
     grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
     align-items: start;
     gap: 16px;
     padding: 28px 24px 0;
@@ -260,15 +262,17 @@
     font-size: clamp(1.8rem, 8vw, 2.2rem);
   }
 
+  /* Foto recortada: siempre apoyada en el borde inferior, como en el sitio de la marca */
   .banner__imagen {
-    max-width: 220px;
-    max-height: 260px;
+    align-self: end;
+    max-width: 240px;
+    max-height: 300px;
     margin: 0 auto;
   }
 
   /* Foto completa: debajo del texto, de borde a borde y rellenando el alto restante */
   .banner__slide--foto {
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto minmax(200px, 1fr);
     gap: 0;
     padding: 0;
   }
@@ -277,7 +281,10 @@
     padding: 28px 24px 20px;
   }
 
+  /* height 0 + min-height 100%: rellena el espacio sin agrandar el banner con su tamaño original */
   .banner__slide--foto .banner__imagen {
-    min-height: 200px;
+    align-self: stretch;
+    height: 0;
+    min-height: 100%;
   }
 }

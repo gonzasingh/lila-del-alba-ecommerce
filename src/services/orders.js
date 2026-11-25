@@ -13,6 +13,14 @@ export class SinStockError extends Error {
   }
 }
 
+// La base es la de otra aplicación (por ejemplo, la del sitio ya publicado): no se escribe en ella
+export class BaseAjenaError extends Error {
+  constructor() {
+    super('La base de datos tiene el formato de otra aplicación')
+    this.name = 'BaseAjenaError'
+  }
+}
+
 // Unidades pedidas de cada producto, sumando sus variedades
 const unidadesPorProducto = (lineas) =>
   lineas.reduce(
@@ -55,6 +63,10 @@ export const crearOrden = async (datos) => {
     const productos = await Promise.all(
       ids.map((id) => transaccion.get(doc(db, 'products', id))),
     )
+
+    // Protección: solo se compra sobre productos cargados por este proyecto (npm run seed
+    // los guarda con "img"). Si no, se corta acá, antes de cualquier escritura.
+    if (productos.some((p) => p.exists() && !p.data().img)) throw new BaseAjenaError()
 
     const faltantes = ids.flatMap((id, i) => {
       const disponible = productos[i].exists() ? productos[i].data().stock : 0

@@ -1,20 +1,47 @@
-/* Cabecera web: logo horizontal sobre fondo blanco */
+/* Barra fija e integrada en la página: arriba de todo es transparente y, al bajar,
+   se convierte en una "píldora" de vidrio translúcido (estilo liquid glass). */
 .navbar {
-  position: sticky;
+  position: fixed;
   top: 0;
+  right: 0;
+  left: 0;
   z-index: 10;
-  background-color: rgba(254, 254, 254, 0.96);
-  border-bottom: 1px solid var(--borde);
-  backdrop-filter: blur(8px);
+  padding: 12px 12px 0;
+  pointer-events: none; /* los márgenes transparentes no tapan los clics de la página */
 }
 
 .navbar__contenido {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
-  max-width: 1200px;
+  gap: 1.25rem;
+  max-width: 1152px;
   margin: 0 auto;
-  padding: 0.6rem 1.5rem;
+  padding: 0.5rem 1.5rem;
+  border: 1px solid transparent;
+  border-radius: 28px;
+  pointer-events: auto;
+  transition:
+    background-color 0.5s ease,
+    border-color 0.5s ease,
+    box-shadow 0.5s ease,
+    backdrop-filter 0.5s ease;
+}
+
+/* ---------- Vidrio: al hacer scroll o con el menú abierto ---------- */
+.navbar--vidrio .navbar__contenido {
+  border-color: rgba(183, 164, 251, 0.4);
+  background-color: rgba(255, 255, 255, 0.68);
+  box-shadow:
+    0 14px 34px -16px rgba(28, 21, 53, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(183, 164, 251, 0.25);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+}
+
+/* Con el menú del celular abierto el vidrio es más opaco, para leer bien las categorías */
+.navbar--menu .navbar__contenido {
+  background-color: rgba(255, 255, 255, 0.92);
 }
 
 /* Logo a la izquierda: el margen automático empuja categorías y carrito a la derecha */
@@ -38,16 +65,16 @@
 
 .navbar__enlace {
   display: block;
-  padding: 0.5rem 0.9rem;
+  padding: 0.5rem 0.85rem;
   border-radius: 999px;
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--violeta);
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .navbar__enlace:hover {
-  background-color: var(--bruma);
+  background-color: rgba(183, 164, 251, 0.22);
 }
 
 /* Categoría que se está viendo */
@@ -63,10 +90,11 @@
   display: none;
 }
 
-/* ---------- Pantallas chicas: categorías en un menú desplegable ---------- */
+/* ---------- Pantallas chicas: las categorías se despliegan dentro de la misma píldora ---------- */
 @media (max-width: 900px) {
   .navbar__contenido {
-    gap: 0.6rem;
+    flex-wrap: wrap;
+    gap: 0 0.6rem;
     padding: 0.5rem 1rem;
   }
 
@@ -87,9 +115,9 @@
     width: 46px;
     height: 46px;
     padding: 0;
-    border: none;
+    border: 1px solid rgba(59, 43, 115, 0.16);
     border-radius: 50%;
-    background-color: var(--bruma);
+    background-color: rgba(255, 255, 255, 0.65);
     color: var(--violeta);
     cursor: pointer;
     transition: background-color 0.2s ease;
@@ -142,29 +170,21 @@
     transform: translateY(-7px) rotate(-45deg);
   }
 
-  /* Panel desplegable debajo de la barra. Cerrado: invisible y fuera del orden de tabulación */
+  /* Menú: ocupa una fila nueva debajo del logo. Cerrado no se ve ni se puede enfocar */
   .navbar__categorias {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    max-height: calc(100vh - 70px);
+    display: none;
+    order: 3;
+    flex-basis: 100%;
+    max-height: calc(100vh - 110px);
+    margin-top: 0.5rem;
     overflow-y: auto;
-    padding: 0.5rem 1rem 1rem;
-    border-bottom: 1px solid var(--borde);
-    background-color: var(--blanco);
-    box-shadow: var(--sombra);
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-8px);
-    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0.2s;
+    padding: 0.5rem 0 0.25rem;
+    border-top: 1px solid rgba(183, 164, 251, 0.4);
   }
 
   .navbar__categorias--abierto {
-    opacity: 1;
-    visibility: visible;
-    transform: none;
-    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s;
+    display: block;
+    animation: navbar-aparecer 0.25s ease;
   }
 
   .navbar__lista {
@@ -177,5 +197,12 @@
     padding: 0.8rem 1rem;
     border-radius: 14px;
     font-size: 1.05rem;
+  }
+}
+
+@keyframes navbar-aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
   }
 }

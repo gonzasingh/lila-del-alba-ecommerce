@@ -26,6 +26,15 @@
   --fuente-titulos: var(--fuente-texto);
   --radio: 20px;
   --sombra: 0 8px 24px rgba(59, 43, 115, 0.12);
+
+  /* Alto que ocupa el Navbar fijo (margen superior incluido) */
+  --alto-navbar: 84px;
+}
+
+@media (max-width: 900px) {
+  :root {
+    --alto-navbar: 76px;
+  }
 }
 
 * {

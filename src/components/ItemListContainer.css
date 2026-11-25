@@ -4,11 +4,16 @@
   padding: 1.5rem 1.5rem 4rem;
 }
 
-/* Título de la lista y cantidad de productos */
+/* Título y cantidad a la izquierda; buscador y orden a la derecha (abajo en el celular) */
 .item-list-container__encabezado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
   margin: 0 0 1.5rem;
   /* Deja lugar para la barra fija cuando se llega con el ancla "#catalogo" */
-  scroll-margin-top: 90px;
+  scroll-margin-top: calc(var(--alto-navbar) + 8px);
 }
 
 .item-list-container__titulo {
@@ -23,6 +28,35 @@
 .item-list-container__cantidad {
   margin: 0.2rem 0 0;
   color: var(--texto-suave);
+}
+
+.item-list-container__sin-resultados {
+  padding: 2.5rem 1.5rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background-color: var(--blanco);
+  text-align: center;
+}
+
+.item-list-container__sin-resultados h2 {
+  margin: 0 0 0.5rem;
+  color: var(--violeta);
+}
+
+.item-list-container__sin-resultados p {
+  margin: 0 0 1.25rem;
+  overflow-wrap: anywhere;
+  color: var(--texto-suave);
+}
+
+.item-list-container__sin-resultados button {
+  padding: 0.7rem 1.5rem;
+  border: none;
+  border-radius: 999px;
+  background-color: var(--violeta);
+  font-weight: 700;
+  color: var(--blanco);
+  cursor: pointer;
 }
 
 .item-list-container__error {

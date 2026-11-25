@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { getProducts } from '../services/products'
 import { CATEGORIAS, getNombreCategoria } from '../mock/categories'
+import { filtrarYOrdenar } from '../utils/filtrarProductos'
 import Banner from './Banner'
 import ItemList from './ItemList'
+import ProductToolbar from './ProductToolbar'
 import Cargando from './Cargando'
 import NotFound from './NotFound'
 import './ItemListContainer.css'
@@ -18,6 +20,13 @@ function ItemListContainer({ greeting }) {
   const [items, setItems] = useState([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState(false)
+
+  // Lo que escribió en el buscador y el orden elegido (se reinician al cambiar de página)
+  const [texto, setTexto] = useState('')
+  const [orden, setOrden] = useState('lista')
+
+  // La lista que se muestra se calcula a partir de los productos: no se guarda en otro estado
+  const visibles = filtrarYOrdenar(items, { texto, orden })
 
   // Se ejecuta al montar el componente y cada vez que cambia la categoría de la URL
   useEffect(() => {
@@ -59,14 +68,18 @@ function ItemListContainer({ greeting }) {
 
       {/* id="catalogo": destino del ancla "#catalogo" que usan los botones del banner */}
       <div className="item-list-container__encabezado" id="catalogo">
-        <h1 className="item-list-container__titulo">
-          {categoryId ? getNombreCategoria(categoryId) : greeting}
-        </h1>
-        {!cargando && !error && (
-          <p className="item-list-container__cantidad">
-            {items.length} {items.length === 1 ? 'producto' : 'productos'}
-          </p>
-        )}
+        <div>
+          <h1 className="item-list-container__titulo">
+            {categoryId ? getNombreCategoria(categoryId) : greeting}
+          </h1>
+          {!cargando && !error && (
+            <p className="item-list-container__cantidad" aria-live="polite">
+              {visibles.length} {visibles.length === 1 ? 'producto' : 'productos'}
+            </p>
+          )}
+        </div>
+
+        <ProductToolbar texto={texto} onTexto={setTexto} orden={orden} onOrden={setOrden} />
       </div>
 
       {cargando && <Cargando mensaje="Cargando productos..." />}
@@ -77,7 +90,20 @@ function ItemListContainer({ greeting }) {
         </p>
       )}
 
-      {!cargando && !error && <ItemList items={items} />}
+      {!cargando &&
+        !error &&
+        // La búsqueda no encontró nada (distinto de una categoría sin productos)
+        (items.length > 0 && visibles.length === 0 ? (
+          <div className="item-list-container__sin-resultados">
+            <h2>No encontramos resultados</h2>
+            <p>No hay productos que coincidan con “{texto.trim()}”.</p>
+            <button type="button" onClick={() => setTexto('')}>
+              Limpiar búsqueda
+            </button>
+          </div>
+        ) : (
+          <ItemList items={visibles} />
+        ))}
     </main>
   )
 }

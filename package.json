@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "seed": "node --env-file=.env.local scripts/seed-firestore.mjs"
+    "seed": "node scripts/seed-firestore.mjs"
   },
   "dependencies": {
     "firebase": "^13.4.0",
