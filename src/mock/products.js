@@ -365,7 +365,7 @@ export const products = [
     name: 'Difusor para auto 9 ml',
     price: 4800,
     category: 'hogar',
-    img: '/productos/hogar.webp',
+    img: '/productos/difusor-auto-9ml.jpg',
     stock: 24,
     description: 'Difusor de 9 ml para perfumar el interior del auto, con el aroma que elijas.',
     presentation: '9 ml',

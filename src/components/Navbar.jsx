@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import CartWidget from './CartWidget'
-import { CATEGORIAS } from '../mock/categories'
+import UserWidget from './UserWidget'
+import { CATEGORIAS } from '../constants/categories'
 import logoHorizontal from '../assets/logo-horizontal.svg'
 import './Navbar.css'
 
@@ -96,6 +97,9 @@ function Navbar() {
             ))}
           </ul>
         </nav>
+
+        {/* Cuenta: "Ingresar", o el email del usuario con "Cerrar sesión" */}
+        <UserWidget menuAbierto={menuAbierto} onNavegar={cerrarMenu} />
 
         <CartWidget />
 

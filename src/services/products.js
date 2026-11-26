@@ -1,10 +1,8 @@
-// Origen de los productos.
-//  - Con Firebase configurado (.env o variables de Vercel): colección "products" de Firestore.
-//  - Sin configurar: el mock local, para que el proyecto se pueda probar sin credenciales.
-// Los componentes reciben los datos de la misma forma en los dos casos.
+// Catálogo de productos: se lee de la colección "products" de Cloud Firestore.
+// Los componentes reciben los datos ya adaptados (ver aProducto) y manejan los estados de
+// carga y de error; acá solo se consulta.
 import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore'
-import { db, firebaseConfigured } from './firebase'
-import * as mock from '../mock/asyncMock'
+import { db, exigirFirebase } from '../firebase/config'
 
 // La base puede tener dos formatos:
 //  - el de este proyecto (npm run seed): "img" y opciones { id, label, title, choices }
@@ -70,9 +68,9 @@ const aProducto = (documento) => {
   }
 }
 
-// Todos los productos, o solo los de una categoría
+// Todos los productos, o solo los de una categoría (el filtro lo hace Firestore con where)
 export const getProducts = async (categoryId) => {
-  if (!firebaseConfigured) return mock.getProducts(categoryId)
+  exigirFirebase()
 
   const coleccion = collection(db, 'products')
   const consulta = categoryId ? query(coleccion, where('category', '==', categoryId)) : coleccion
@@ -82,12 +80,16 @@ export const getProducts = async (categoryId) => {
   return respuesta.docs.map(aProducto).sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
 }
 
-// UN producto por su id. Si no existe, la promesa se rechaza (igual que el mock)
+// UN producto por su id (doc + getDoc). Si no existe, la promesa se rechaza
 export const getProductById = async (productId) => {
-  if (!firebaseConfigured) return mock.getProductById(productId)
+  exigirFirebase()
 
   const documento = await getDoc(doc(db, 'products', String(productId)))
-  if (!documento.exists()) throw new Error(`No existe un producto con id "${productId}"`)
+  if (!documento.exists()) {
+    throw Object.assign(new Error(`No existe un producto con id "${productId}"`), {
+      code: 'app/producto-inexistente',
+    })
+  }
 
   return aProducto(documento)
 }

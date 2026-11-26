@@ -1,0 +1,56 @@
+/* Página de checkout: los estilos del resumen, los botones y la compra confirmada
+   son los de Cart.css (clases "cart__*"); acá solo lo propio del checkout. */
+.checkout-page__bloque {
+  padding: 1.4rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background-color: var(--blanco);
+}
+
+.checkout-page__bloque + .checkout-page__bloque {
+  margin-top: 1rem;
+}
+
+.checkout-page__subtitulo {
+  margin: 0 0 1rem;
+  font-family: var(--fuente-titulos);
+  font-size: 1.3rem;
+  color: var(--noche);
+}
+
+.checkout-page__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.checkout-page__linea {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.checkout-page__imagen {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  object-fit: cover;
+  background-color: var(--bruma);
+}
+
+.checkout-page__nombre {
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.checkout-page__detalle {
+  margin: 0.15rem 0 0;
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+}
+
+.checkout-page__subtotal {
+  color: var(--violeta);
+}

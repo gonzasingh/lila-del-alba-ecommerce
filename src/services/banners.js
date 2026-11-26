@@ -6,7 +6,7 @@
 //  2. Si no, en el JSON de VITE_BANNERS_URL (URL remota) o en /banners.json (carpeta public).
 //  3. Si nada se puede leer, se muestra una diapositiva de respaldo para que el banner nunca quede vacío.
 import { collection, getDocs } from 'firebase/firestore'
-import { db, firebaseConfigured } from './firebase'
+import { db, firebaseConfigured } from '../firebase/config'
 
 const URL_BANNERS = import.meta.env.VITE_BANNERS_URL || '/banners.json'
 const MAX_DIAPOSITIVAS = 10

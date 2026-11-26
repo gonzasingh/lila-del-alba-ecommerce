@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { getNombreCategoria } from '../mock/categories'
+import { getNombreCategoria } from '../constants/categories'
 import { formatearPrecio } from '../utils/formatearPrecio'
 import './Item.css'
 

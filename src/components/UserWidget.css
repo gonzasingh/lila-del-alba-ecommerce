@@ -1,0 +1,111 @@
+/* ---------- Sin sesión: link "Ingresar" ---------- */
+.user-widget__ingresar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 46px;
+  padding: 0 1rem;
+  border: 1px solid rgba(59, 43, 115, 0.16);
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.65);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--violeta);
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.user-widget__ingresar:hover {
+  background-color: var(--lila-suave);
+}
+
+.user-widget__icono {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+/* ---------- Con sesión: email y botón para salir ---------- */
+.user-widget__sesion {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.user-widget__email {
+  max-width: 190px;
+  overflow: hidden;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--texto-suave);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-widget__salir {
+  flex-shrink: 0;
+  padding: 0.5rem 0.95rem;
+  border: 1.5px solid var(--borde);
+  border-radius: 999px;
+  background-color: transparent;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--violeta);
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.user-widget__salir:hover {
+  border-color: var(--violeta);
+  background-color: var(--bruma);
+}
+
+.user-widget__error {
+  font-size: 0.85rem;
+  color: var(--error);
+}
+
+/* ---------- Pantallas chicas ---------- */
+@media (max-width: 900px) {
+  /* El email y "Cerrar sesión" van en una fila propia, dentro del menú desplegable */
+  .user-widget__sesion {
+    display: none;
+    order: 4;
+    flex-basis: 100%;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 0.6rem 0.25rem 0.25rem;
+    border-top: 1px solid rgba(183, 164, 251, 0.4);
+  }
+
+  .user-widget__sesion--abierto {
+    display: flex;
+  }
+
+  .user-widget__email {
+    flex: 1 1 140px;
+    max-width: none;
+    font-size: 1rem;
+  }
+}
+
+/* En celulares "Ingresar" queda solo como ícono, igual que el carrito */
+@media (max-width: 600px) {
+  .user-widget__ingresar {
+    justify-content: center;
+    width: 46px;
+    padding: 0;
+  }
+
+  /* Se oculta a la vista pero lo sigue leyendo un lector de pantalla (igual que .sr-only) */
+  .user-widget__texto {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+}

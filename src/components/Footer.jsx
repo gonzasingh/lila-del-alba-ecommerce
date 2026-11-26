@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { CATEGORIAS } from '../mock/categories'
+import { CATEGORIAS } from '../constants/categories'
 import logoOscuro from '../assets/logo-horizontal-oscuro.svg'
 import './Footer.css'
 

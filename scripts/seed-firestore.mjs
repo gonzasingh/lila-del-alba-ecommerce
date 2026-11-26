@@ -1,4 +1,6 @@
-// Carga en Firestore los productos (src/mock/products.js) y los banners (public/banners.json).
+// Carga inicial de Firestore: sube los productos (scripts/data/products.js) y los banners (public/banners.json).
+// Es un script que se corre una sola vez desde la terminal: la tienda NO lee los productos de este archivo,
+// los lee de Firestore.
 //
 //   npm run seed              carga los datos si la colección "products" está vacía
 //   npm run seed -- --force   reemplaza lo que haya (¡vuelve el stock a los valores del archivo!)
@@ -17,7 +19,7 @@ import {
   writeBatch,
 } from 'firebase/firestore'
 import { loadEnv } from 'vite'
-import { products } from '../src/mock/products.js'
+import { products } from './data/products.js'
 
 const env = loadEnv('development', process.cwd(), 'VITE_')
 

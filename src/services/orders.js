@@ -1,8 +1,16 @@
 // Órdenes de compra en Firestore.
-// La orden se guarda en la colección "orders" y, en la misma transacción, se descuenta
-// el stock de cada producto: o se hacen las dos cosas o ninguna.
-import { collection, doc, runTransaction, serverTimestamp } from 'firebase/firestore'
-import { db } from './firebase'
+// La orden se guarda con addDoc en la colección "orders", asociada al usuario autenticado,
+// y después se descuenta el stock de los productos comprados.
+import {
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  increment,
+  serverTimestamp,
+  writeBatch,
+} from 'firebase/firestore'
+import { db, exigirFirebase } from '../firebase/config'
 
 // Error propio para avisar qué productos ya no tienen stock suficiente
 export class SinStockError extends Error {
@@ -32,8 +40,17 @@ const unidadesPorProducto = (lineas) =>
   )
 
 // Datos de la orden. Firestore no acepta valores "undefined": lo que puede faltar va como null
-export const armarOrden = ({ comprador, lineas, subtotal, descuento, total }) => ({
-  buyer: { name: comprador.name, phone: comprador.phone, email: comprador.email },
+export const armarOrden = ({ usuario, comprador, lineas, subtotal, descuento, total }) => ({
+  // Usuario autenticado que hizo la compra (las reglas de Firestore exigen que coincida con la sesión)
+  userId: usuario.uid,
+  userEmail: usuario.email,
+  buyer: {
+    name: comprador.name,
+    phone: comprador.phone,
+    address: comprador.address,
+    city: comprador.city,
+    notes: comprador.notes,
+  },
   items: lineas.map((linea) => ({
     id: linea.id,
     name: linea.name,
@@ -50,37 +67,50 @@ export const armarOrden = ({ comprador, lineas, subtotal, descuento, total }) =>
   status: 'generada',
 })
 
-// Crea la orden y devuelve su id
+// Antes de crear la orden se revisa que cada producto tenga stock para lo que se pidió
+const verificarStock = async (pedido, lineas) => {
+  const ids = Object.keys(pedido)
+  const productos = await Promise.all(ids.map((id) => getDoc(doc(db, 'products', id))))
+
+  // Protección: solo se compra sobre productos cargados por este proyecto (npm run seed
+  // los guarda con "img"). Si no, se corta acá, antes de escribir nada.
+  if (productos.some((p) => p.exists() && !p.data().img)) throw new BaseAjenaError()
+
+  const faltantes = ids.flatMap((id, i) => {
+    const disponible = productos[i].exists() ? productos[i].data().stock : 0
+    if (disponible >= pedido[id]) return []
+    return [{ name: lineas.find((linea) => linea.id === id).name, disponible }]
+  })
+  if (faltantes.length > 0) throw new SinStockError(faltantes)
+}
+
+// Descuenta del stock lo comprado (todos los productos juntos, en un solo lote).
+// La orden ya está guardada: si esto falla no se anula la compra, solo se deja un aviso en la consola.
+const descontarStock = async (pedido) => {
+  try {
+    const lote = writeBatch(db)
+    Object.entries(pedido).forEach(([id, unidades]) => {
+      lote.update(doc(db, 'products', id), { stock: increment(-unidades) })
+    })
+    await lote.commit()
+  } catch (error) {
+    console.warn('La orden se guardó, pero no se pudo descontar el stock:', error.message)
+  }
+}
+
+// Crea la orden y devuelve su id. Si algo falla lanza el error (el carrito NO se toca acá)
 export const crearOrden = async (datos) => {
-  if (!db) throw new Error('Firebase no está configurado')
+  exigirFirebase()
 
   const pedido = unidadesPorProducto(datos.lineas)
-  const ids = Object.keys(pedido)
-  const ordenRef = doc(collection(db, 'orders'))
+  await verificarStock(pedido, datos.lineas)
 
-  await runTransaction(db, async (transaccion) => {
-    // 1. Primero todas las lecturas (Firestore lo exige dentro de una transacción)
-    const productos = await Promise.all(
-      ids.map((id) => transaccion.get(doc(db, 'products', id))),
-    )
-
-    // Protección: solo se compra sobre productos cargados por este proyecto (npm run seed
-    // los guarda con "img"). Si no, se corta acá, antes de cualquier escritura.
-    if (productos.some((p) => p.exists() && !p.data().img)) throw new BaseAjenaError()
-
-    const faltantes = ids.flatMap((id, i) => {
-      const disponible = productos[i].exists() ? productos[i].data().stock : 0
-      if (disponible >= pedido[id]) return []
-      return [{ name: datos.lineas.find((linea) => linea.id === id).name, disponible }]
-    })
-    if (faltantes.length > 0) throw new SinStockError(faltantes)
-
-    // 2. Después las escrituras: se descuenta el stock y se guarda la orden
-    ids.forEach((id, i) => {
-      transaccion.update(productos[i].ref, { stock: productos[i].data().stock - pedido[id] })
-    })
-    transaccion.set(ordenRef, { ...armarOrden(datos), date: serverTimestamp() })
+  const referencia = await addDoc(collection(db, 'orders'), {
+    ...armarOrden(datos),
+    date: serverTimestamp(),
   })
 
-  return ordenRef.id
+  await descontarStock(pedido)
+
+  return referencia.id
 }

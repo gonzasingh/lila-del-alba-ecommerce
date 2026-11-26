@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { getProducts } from '../services/products'
-import { CATEGORIAS, getNombreCategoria } from '../mock/categories'
+import { CATEGORIAS, getNombreCategoria } from '../constants/categories'
 import { filtrarYOrdenar } from '../utils/filtrarProductos'
 import Banner from './Banner'
 import ItemList from './ItemList'
@@ -43,7 +43,8 @@ function ItemListContainer({ greeting }) {
       try {
         const productos = await getProducts(categoryId)
         if (activo) setItems(productos)
-      } catch {
+      } catch (e) {
+        console.error('No se pudieron cargar los productos:', e)
         if (activo) setError(true)
       } finally {
         if (activo) setCargando(false)

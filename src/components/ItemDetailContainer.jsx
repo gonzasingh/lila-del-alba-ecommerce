@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { getProductById } from '../services/products'
-import { getNombreCategoria } from '../mock/categories'
+import { getNombreCategoria } from '../constants/categories'
 import ItemDetail from './ItemDetail'
 import Cargando from './Cargando'
 import './ItemDetailContainer.css'
@@ -12,7 +12,7 @@ function ItemDetailContainer() {
 
   const [product, setProduct] = useState(null)
   const [cargando, setCargando] = useState(true)
-  const [error, setError] = useState(false)
+  const [error, setError] = useState('') // mensaje para el usuario (vacío si no hubo error)
 
   // Se vuelve a ejecutar cada vez que cambia el id del producto
   useEffect(() => {
@@ -22,15 +22,22 @@ function ItemDetailContainer() {
 
     const cargarProducto = async () => {
       setCargando(true)
-      setError(false)
+      setError('')
       setProduct(null)
 
       try {
         const encontrado = await getProductById(productId)
         if (activo) setProduct(encontrado)
-      } catch {
-        // La promesa se rechaza cuando no existe un producto con ese id
-        if (activo) setError(true)
+      } catch (e) {
+        // La promesa se rechaza si no existe un producto con ese id o si falla la consulta
+        console.error('No se pudo cargar el producto:', e)
+        if (activo) {
+          setError(
+            e.code === 'app/producto-inexistente'
+              ? 'No encontramos este producto. Puede que ya no esté disponible.'
+              : 'No pudimos cargar el producto. Revisá tu conexión e intentá de nuevo.',
+          )
+        }
       } finally {
         if (activo) setCargando(false)
       }
@@ -57,7 +64,7 @@ function ItemDetailContainer() {
 
       {error && (
         <p className="item-detail-container__error" role="alert">
-          No encontramos este producto. Puede que ya no esté disponible.
+          {error}
         </p>
       )}
 

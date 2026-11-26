@@ -1,0 +1,105 @@
+/* Pantallas de inicio de sesión y registro (AuthForm) */
+.auth {
+  max-width: 460px;
+  margin: 0 auto;
+  padding: 3.5rem 1.5rem 4rem;
+  text-align: center;
+}
+
+.auth__flor {
+  display: block;
+  width: 90px;
+  height: auto;
+  margin: 0 auto 1rem;
+}
+
+.auth__titulo {
+  margin: 0 0 0.5rem;
+  font-family: var(--fuente-titulos);
+  font-size: clamp(1.8rem, 5vw, 2.4rem);
+  color: var(--violeta);
+}
+
+.auth__subtitulo {
+  margin: 0 0 1.5rem;
+  line-height: 1.5;
+  color: var(--texto-suave);
+}
+
+/* Motivo por el que lo mandaron acá (por ejemplo, "Iniciá sesión para finalizar tu compra") */
+.auth__aviso {
+  margin: 0 0 1.25rem;
+  padding: 0.75rem 1rem;
+  border-radius: 14px;
+  background-color: var(--amanecer-suave);
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--noche);
+}
+
+.auth__formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 1.5rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background-color: var(--blanco);
+  text-align: left;
+}
+
+.auth__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.auth__campo input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.55rem 0.8rem;
+  border: 1.5px solid var(--borde);
+  border-radius: 12px;
+  background-color: var(--blanco);
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--texto);
+}
+
+.auth__campo input[aria-invalid='true'] {
+  border-color: var(--error);
+}
+
+.auth__error-campo {
+  margin: 0;
+  font-weight: 500;
+  color: var(--error);
+}
+
+.auth__error {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 14px;
+  background-color: var(--error-fondo);
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: var(--error);
+}
+
+.auth__formulario button:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+.auth__otra {
+  margin: 1.25rem 0 0;
+  color: var(--texto-suave);
+}
+
+.auth__otra a {
+  font-weight: 700;
+  color: var(--violeta);
+  text-decoration: underline;
+}

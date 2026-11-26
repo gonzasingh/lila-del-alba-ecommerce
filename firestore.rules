@@ -4,15 +4,19 @@
 // ¡ATENCIÓN! Son SOLO para un proyecto de Firebase nuevo y exclusivo de esta tienda.
 // NO publicarlas en un proyecto que ya use otra aplicación (por ejemplo el del sitio publicado):
 // reemplazan todas sus reglas y ese sitio dejaría de funcionar.
+//
+// La seguridad no depende de la interfaz: aunque alguien llame a Firestore por su cuenta,
+// estas reglas exigen una sesión iniciada para crear órdenes.
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // El catálogo es público. Desde el sitio solo se puede RESTAR stock (al comprar).
+    // El catálogo es público. Solo un usuario con sesión iniciada puede RESTAR stock (al comprar).
     match /products/{productId} {
       allow read: if true;
-      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['stock'])
+      allow update: if request.auth != null
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['stock'])
                     && request.resource.data.stock is int
                     && request.resource.data.stock >= 0
                     && request.resource.data.stock < resource.data.stock;
@@ -25,22 +29,45 @@ service cloud.firestore {
       allow write: if false;
     }
 
-    // Las órdenes tienen datos personales: el sitio puede crearlas, pero no leerlas ni cambiarlas
+    // Las órdenes tienen datos personales: solo las puede CREAR un usuario autenticado, y a su nombre.
+    // Nadie puede leerlas, cambiarlas ni borrarlas desde el sitio (se consultan en la consola de Firebase).
     match /orders/{orderId} {
-      allow create: if request.resource.data.keys().hasOnly(
-                         ['buyer', 'items', 'subtotal', 'discount', 'total', 'status', 'date'])
-                    && request.resource.data.buyer.keys().hasOnly(['name', 'phone', 'email'])
+      allow create: if request.auth != null
+                    // La orden queda asociada al usuario que tiene la sesión iniciada
+                    && request.resource.data.userId == request.auth.uid
+                    && request.resource.data.userEmail == request.auth.token.email
+                    && request.resource.data.keys().hasOnly(
+                         ['userId', 'userEmail', 'buyer', 'items', 'subtotal', 'discount',
+                          'total', 'status', 'date'])
+                    && request.resource.data.keys().hasAll(
+                         ['userId', 'userEmail', 'buyer', 'items', 'total', 'status', 'date'])
+                    // Datos del comprador (entrega)
+                    && request.resource.data.buyer.keys().hasOnly(
+                         ['name', 'phone', 'address', 'city', 'notes'])
+                    && request.resource.data.buyer.keys().hasAll(['name', 'phone', 'address', 'city'])
                     && request.resource.data.buyer.name is string
+                    && request.resource.data.buyer.name.size() > 0
                     && request.resource.data.buyer.name.size() <= 120
                     && request.resource.data.buyer.phone is string
+                    && request.resource.data.buyer.phone.size() > 0
                     && request.resource.data.buyer.phone.size() <= 40
-                    && request.resource.data.buyer.email is string
-                    && request.resource.data.buyer.email.size() <= 160
+                    && request.resource.data.buyer.address is string
+                    && request.resource.data.buyer.address.size() > 0
+                    && request.resource.data.buyer.address.size() <= 200
+                    && request.resource.data.buyer.city is string
+                    && request.resource.data.buyer.city.size() > 0
+                    && request.resource.data.buyer.city.size() <= 100
+                    && (!('notes' in request.resource.data.buyer)
+                        || (request.resource.data.buyer.notes is string
+                            && request.resource.data.buyer.notes.size() <= 500))
+                    // Productos y total
                     && request.resource.data.items is list
                     && request.resource.data.items.size() > 0
                     && request.resource.data.items.size() <= 100
                     && request.resource.data.total is number
+                    && request.resource.data.total > 0
                     && request.resource.data.status == 'generada'
+                    // La fecha la pone el servidor (serverTimestamp), no el navegador
                     && request.resource.data.date == request.time;
       allow read, update, delete: if false;
     }
