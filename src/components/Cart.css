@@ -18,11 +18,19 @@
   text-align: center;
 }
 
-.cart__flor {
+/* Ilustraciones del carrito vacío y de la compra confirmada (decorativas: el título ya dice lo mismo) */
+.cart__ilustracion {
   display: block;
-  width: 180px;
   height: auto;
-  margin: 0 auto 1rem;
+  margin: 0 auto 1.5rem;
+}
+
+.cart__ilustracion--vacio {
+  width: min(200px, 55%);
+}
+
+.cart__ilustracion--gracias {
+  width: min(300px, 80%);
 }
 
 .cart__mensaje {

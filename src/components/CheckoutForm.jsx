@@ -28,13 +28,28 @@ const validar = ({ name, phone, address, city, notes }) => {
   return errores
 }
 
+const DATOS_VACIOS = { name: '', phone: '', address: '', city: '', notes: '' }
+
 // Formulario con los datos de entrega. No guarda nada: entrega los datos a onSubmit.
-//  - email:    email de la cuenta con la que se compra (se muestra, no se edita)
-//  - onSubmit: recibe { name, phone, address, city, notes }
-//  - enviando: true mientras se genera la orden
-//  - error:    mensaje si la orden no se pudo generar
-function CheckoutForm({ email, onSubmit, enviando, error }) {
-  const [datos, setDatos] = useState({ name: '', phone: '', address: '', city: '', notes: '' })
+// Se usa en el checkout (confirmar la compra) y en "Datos de envío" de la cuenta (guardarlos).
+//  - datosIniciales: datos con los que arranca el formulario (por ejemplo, los guardados en la cuenta)
+//  - email:          email de la cuenta con la que se compra (si se pasa, se muestra; no se edita)
+//  - titulo, textoBoton, textoEnviando: textos, según para qué se use
+//  - onSubmit:       recibe { name, phone, address, city, notes }
+//  - enviando:       true mientras se procesa
+//  - error / exito:  mensajes del resultado de la operación
+function CheckoutForm({
+  datosIniciales,
+  email,
+  titulo = 'Datos de entrega',
+  textoBoton = 'Confirmar compra',
+  textoEnviando = 'Generando tu orden...',
+  onSubmit,
+  enviando,
+  error,
+  exito,
+}) {
+  const [datos, setDatos] = useState({ ...DATOS_VACIOS, ...datosIniciales })
   const [errores, setErrores] = useState({})
 
   const handleChange = (evento) => {
@@ -73,11 +88,13 @@ function CheckoutForm({ email, onSubmit, enviando, error }) {
 
   return (
     <form className="checkout" onSubmit={handleSubmit} noValidate>
-      <h3 className="checkout__titulo">Datos de entrega</h3>
+      <h2 className="checkout__titulo">{titulo}</h2>
 
-      <p className="checkout__cuenta">
-        Comprás con la cuenta <strong>{email}</strong>
-      </p>
+      {email && (
+        <p className="checkout__cuenta">
+          Comprás con la cuenta <strong>{email}</strong>
+        </p>
+      )}
 
       {CAMPOS.map((campo) => (
         <div key={campo.id} className="checkout__campo">
@@ -116,8 +133,14 @@ function CheckoutForm({ email, onSubmit, enviando, error }) {
         </p>
       )}
 
+      {exito && (
+        <p className="checkout__exito" role="status">
+          {exito}
+        </p>
+      )}
+
       <button type="submit" className="cart__boton cart__boton--principal" disabled={enviando}>
-        {enviando ? 'Generando tu orden...' : 'Confirmar compra'}
+        {enviando ? textoEnviando : textoBoton}
       </button>
     </form>
   )

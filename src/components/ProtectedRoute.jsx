@@ -5,7 +5,8 @@ import Cargando from './Cargando'
 // Protege una ruta: solo deja ver a sus hijos si hay un usuario con sesión iniciada.
 // Si no lo hay, redirige al login y le avisa por qué. En el estado de la navegación guarda
 // a dónde quería ir, para volver ahí apenas inicie sesión (ver AuthForm).
-function ProtectedRoute({ children }) {
+// Prop aviso: el motivo que se le muestra en el login (depende de la página que quería ver).
+function ProtectedRoute({ children, aviso = 'Iniciá sesión para continuar.' }) {
   const { user, loading } = useAuth()
   const location = useLocation()
 
@@ -18,7 +19,7 @@ function ProtectedRoute({ children }) {
       <Navigate
         to="/login"
         replace
-        state={{ from: location.pathname, aviso: 'Iniciá sesión para finalizar tu compra.' }}
+        state={{ from: location.pathname, aviso }}
       />
     )
   }

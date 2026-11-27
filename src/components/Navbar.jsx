@@ -98,8 +98,8 @@ function Navbar() {
           </ul>
         </nav>
 
-        {/* Cuenta: "Ingresar", o el email del usuario con "Cerrar sesión" */}
-        <UserWidget menuAbierto={menuAbierto} onNavegar={cerrarMenu} />
+        {/* Cuenta: ícono para ingresar, o la inicial del usuario con su menú */}
+        <UserWidget onAbrir={cerrarMenu} />
 
         <CartWidget />
 

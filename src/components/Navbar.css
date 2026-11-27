@@ -11,6 +11,7 @@
 }
 
 .navbar__contenido {
+  position: relative; /* el menú de la cuenta se ubica respecto de la barra en pantallas angostas */
   display: flex;
   align-items: center;
   gap: 1.25rem;
@@ -90,8 +91,11 @@
   display: none;
 }
 
-/* ---------- Pantallas chicas: las categorías se despliegan dentro de la misma píldora ---------- */
-@media (max-width: 900px) {
+/* ---------- Pantallas chicas: las categorías se despliegan dentro de la misma píldora ----------
+   Con el logo, las categorías y los dos círculos (cuenta y carrito), el Navbar necesita unos 975px
+   para mostrarse completo: por debajo de 1024px se colapsa para que el logo no se achique.
+   Si se cambia este número, hay que cambiarlo también en index.css. */
+@media (max-width: 1024px) {
   .navbar__contenido {
     flex-wrap: wrap;
     gap: 0 0.6rem;
@@ -112,8 +116,8 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    width: 46px;
-    height: 46px;
+    width: var(--circulo-navbar);
+    height: var(--circulo-navbar);
     padding: 0;
     border: 1px solid rgba(59, 43, 115, 0.16);
     border-radius: 50%;
@@ -204,5 +208,17 @@
   from {
     opacity: 0;
     transform: translateY(-6px);
+  }
+}
+
+/* Celulares muy angostos (320px): logo y márgenes más chicos para que el logo y los tres círculos
+   (cuenta, carrito y menú) entren en una sola fila. Los círculos se achican en index.css. */
+@media (max-width: 360px) {
+  .navbar__contenido {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .navbar__logo {
+    height: 36px;
   }
 }

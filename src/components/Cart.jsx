@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import ResumenCompra from './ResumenCompra'
 import { useCart } from '../context/CartContext'
 import { formatearPrecio } from '../utils/formatearPrecio'
-import carritoVacio from '../assets/carritovacio.svg'
+import ilustracionVacio from '../assets/carrito-vacio.svg'
 import './Cart.css'
 
 // Vista del carrito (ruta /cart): lista los productos agregados, permite quitarlos
@@ -16,7 +16,7 @@ function Cart() {
   if (lines.length === 0) {
     return (
       <main className="cart cart--vacio">
-        <img className="cart__flor" src={carritoVacio} alt="" />
+        <img className="cart__ilustracion cart__ilustracion--vacio" src={ilustracionVacio} alt="" />
         <h1 className="cart__titulo">Tu carrito está vacío</h1>
         <p className="cart__mensaje">
           Todavía no elegiste nada, pero hay muchos aromas y productos de cuidado personal

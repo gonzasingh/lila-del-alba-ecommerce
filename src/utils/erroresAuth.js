@@ -13,6 +13,9 @@ const MENSAJES = {
   'auth/network-request-failed': 'No pudimos conectarnos. Revisá tu conexión e intentá de nuevo.',
   'auth/operation-not-allowed':
     'El acceso con email y contraseña no está habilitado en Firebase Authentication.',
+  'auth/requires-recent-login':
+    'Por seguridad, cerrá sesión, volvé a ingresar e intentá de nuevo.',
+  'app/sin-sesion': 'Tu sesión se cerró. Volvé a iniciar sesión.',
   'app/firebase-no-configurado': 'La tienda no está conectada a Firebase todavía.',
 }
 

@@ -88,6 +88,17 @@
   color: var(--error);
 }
 
+/* Confirmación (por ejemplo, "cambiaste tu contraseña") */
+.auth__exito {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 14px;
+  background-color: var(--ok-fondo);
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: var(--ok);
+}
+
 .auth__formulario button:disabled {
   cursor: progress;
   opacity: 0.6;

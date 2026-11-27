@@ -1,12 +1,14 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
+import Cargando from './Cargando'
 import CheckoutForm from './CheckoutForm'
 import ResumenCompra from './ResumenCompra'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 import { BaseAjenaError, crearOrden, SinStockError } from '../services/orders'
+import { obtenerDatosEnvio } from '../services/users'
 import { formatearPrecio } from '../utils/formatearPrecio'
-import graciasPorCompra from '../assets/graciasxcompra.svg'
+import ilustracionGracias from '../assets/gracias-por-tu-compra.svg'
 import './Checkout.css'
 
 // Mensaje claro para cada motivo por el que puede fallar la generación de la orden
@@ -39,6 +41,29 @@ function Checkout() {
   const [enviando, setEnviando] = useState(false)
   const [errorOrden, setErrorOrden] = useState('')
   const [orden, setOrden] = useState(null) // { id, total } cuando la compra se completó
+  // Datos de envío que el usuario guardó en su cuenta (para completar el formulario)
+  const [datosGuardados, setDatosGuardados] = useState(null)
+  const [cargandoDatos, setCargandoDatos] = useState(true)
+
+  useEffect(() => {
+    let activo = true // evita actualizar el estado si se sale de la página antes de que llegue la respuesta
+
+    obtenerDatosEnvio(user.uid)
+      .then((datos) => {
+        if (activo) setDatosGuardados(datos)
+      })
+      .catch((error) => {
+        // No es grave: el usuario simplemente completa el formulario a mano
+        console.warn('No se pudieron leer los datos de envío guardados:', error.message)
+      })
+      .finally(() => {
+        if (activo) setCargandoDatos(false)
+      })
+
+    return () => {
+      activo = false
+    }
+  }, [user.uid])
 
   const confirmarCompra = async (comprador) => {
     setErrorOrden('')
@@ -69,6 +94,12 @@ function Checkout() {
       clear()
     } catch (error) {
       console.error('No se pudo generar la orden:', error)
+      if (error.code === 'permission-denied') {
+        // Casi siempre significa que en Firebase siguen publicadas unas reglas viejas
+        console.warn(
+          'Firestore rechazó la orden. Publicá las reglas actuales de firestore.rules en la consola de Firebase (Firestore Database → Reglas → Publicar).',
+        )
+      }
       setErrorOrden(mensajeErrorOrden(error))
     } finally {
       setEnviando(false)
@@ -80,7 +111,7 @@ function Checkout() {
   if (orden) {
     return (
       <main className="cart cart--vacio">
-        <img className="cart__flor" src={graciasPorCompra} alt="" />
+        <img className="cart__ilustracion cart__ilustracion--gracias" src={ilustracionGracias} alt="" />
         <h1 className="cart__titulo">¡Gracias por tu compra!</h1>
         <div className="cart__orden" role="status">
           <p>Tu compra fue registrada. Tu número de orden es</p>
@@ -130,12 +161,17 @@ function Checkout() {
           </section>
 
           <section className="checkout-page__bloque">
-            <CheckoutForm
-              email={user.email}
-              onSubmit={confirmarCompra}
-              enviando={enviando}
-              error={errorOrden}
-            />
+            {cargandoDatos ? (
+              <Cargando mensaje="Cargando tus datos..." />
+            ) : (
+              <CheckoutForm
+                datosIniciales={datosGuardados}
+                email={user.email}
+                onSubmit={confirmarCompra}
+                enviando={enviando}
+                error={errorOrden}
+              />
+            )}
           </section>
         </div>
 

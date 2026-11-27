@@ -1,10 +1,11 @@
 .cart-widget {
   position: relative;
+  flex-shrink: 0; /* el círculo no se deforma aunque la barra quede justa */
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 46px;
-  height: 46px;
+  width: var(--circulo-navbar);
+  height: var(--circulo-navbar);
   padding: 0;
   border: 1px solid rgba(59, 43, 115, 0.16);
   border-radius: 50%;

@@ -57,8 +57,8 @@ const AROMAS_HOGAR = [
 const OPCION_ARCILLA = {
   id: 'arcilla',
   label: 'Arcilla',
-  title: 'Elegí tu exfoliante',
-  choices: ['Arcilla blanca', 'Café'],
+  title: 'Elegí el color de la arcilla',
+  choices: ['Blanca', 'Café'],
 }
 const OPCION_CABELLO = {
   id: 'cabello',

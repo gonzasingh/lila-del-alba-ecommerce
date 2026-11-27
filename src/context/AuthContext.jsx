@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import {
+  cambiarContrasena,
   cerrarSesion,
   iniciarSesion,
   observarSesion,
@@ -30,6 +31,7 @@ export function useAuth() {
 //   register  (email, password) crea la cuenta e inicia sesión
 //   login     (email, password) inicia sesión con una cuenta existente
 //   logout    cierra la sesión
+//   changePassword  (contraseñaActual, contraseñaNueva) cambia la contraseña
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -54,6 +56,7 @@ export function AuthProvider({ children }) {
         register: registrarUsuario,
         login: iniciarSesion,
         logout: cerrarSesion,
+        changePassword: cambiarContrasena,
       }}
     >
       {children}

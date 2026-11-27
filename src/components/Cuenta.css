@@ -1,0 +1,44 @@
+/* Páginas de la cuenta (datos de envío). El cambio de contraseña usa los estilos de AuthForm.css. */
+.cuenta {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 4rem;
+}
+
+.cuenta__titulo {
+  margin: 0 0 0.5rem;
+  font-family: var(--fuente-titulos);
+  font-size: clamp(1.8rem, 5vw, 2.4rem);
+  color: var(--violeta);
+}
+
+.cuenta__subtitulo {
+  margin: 0 0 1.5rem;
+  line-height: 1.5;
+  color: var(--texto-suave);
+}
+
+.cuenta__aviso {
+  margin: 0 0 1.25rem;
+  padding: 0.75rem 1rem;
+  border-radius: 14px;
+  background-color: var(--amanecer-suave);
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--noche);
+}
+
+.cuenta__bloque {
+  padding: 1.4rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background-color: var(--blanco);
+}
+
+.cuenta__volver {
+  display: inline-block;
+  margin-top: 1.25rem;
+  font-weight: 700;
+  color: var(--violeta);
+  text-decoration: underline;
+}

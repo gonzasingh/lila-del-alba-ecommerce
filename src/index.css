@@ -29,9 +29,20 @@
 
   /* Alto que ocupa el Navbar fijo (margen superior incluido) */
   --alto-navbar: 84px;
+
+  /* Diámetro de los círculos del Navbar: cuenta, carrito y menú hamburguesa */
+  --circulo-navbar: 46px;
 }
 
-@media (max-width: 900px) {
+/* Celulares muy angostos: círculos más chicos para que el logo y los tres botones entren en una fila */
+@media (max-width: 360px) {
+  :root {
+    --circulo-navbar: 40px;
+  }
+}
+
+/* Mismo punto de corte que el menú hamburguesa del Navbar (Navbar.css) */
+@media (max-width: 1024px) {
   :root {
     --alto-navbar: 76px;
   }

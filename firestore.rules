@@ -12,6 +12,17 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Datos de envío: son los mismos en una orden (buyer) y en los datos guardados de la cuenta (shipping)
+    function datosEnvioValidos(d) {
+      return d.keys().hasOnly(['name', 'phone', 'address', 'city', 'notes'])
+          && d.keys().hasAll(['name', 'phone', 'address', 'city'])
+          && d.name is string && d.name.size() > 0 && d.name.size() <= 120
+          && d.phone is string && d.phone.size() > 0 && d.phone.size() <= 40
+          && d.address is string && d.address.size() > 0 && d.address.size() <= 200
+          && d.city is string && d.city.size() > 0 && d.city.size() <= 100
+          && (!('notes' in d) || (d.notes is string && d.notes.size() <= 500));
+    }
+
     // El catálogo es público. Solo un usuario con sesión iniciada puede RESTAR stock (al comprar).
     match /products/{productId} {
       allow read: if true;
@@ -29,6 +40,18 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // Datos de cada usuario (hoy, sus datos de envío). El documento tiene como id el uid del usuario:
+    // cada uno solo puede leer y escribir el suyo.
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow create, update: if request.auth != null && request.auth.uid == userId
+                            && request.resource.data.keys().hasOnly(['shipping', 'updatedAt'])
+                            && request.resource.data.keys().hasAll(['shipping', 'updatedAt'])
+                            && datosEnvioValidos(request.resource.data.shipping)
+                            && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+
     // Las órdenes tienen datos personales: solo las puede CREAR un usuario autenticado, y a su nombre.
     // Nadie puede leerlas, cambiarlas ni borrarlas desde el sitio (se consultan en la consola de Firebase).
     match /orders/{orderId} {
@@ -42,24 +65,7 @@ service cloud.firestore {
                     && request.resource.data.keys().hasAll(
                          ['userId', 'userEmail', 'buyer', 'items', 'total', 'status', 'date'])
                     // Datos del comprador (entrega)
-                    && request.resource.data.buyer.keys().hasOnly(
-                         ['name', 'phone', 'address', 'city', 'notes'])
-                    && request.resource.data.buyer.keys().hasAll(['name', 'phone', 'address', 'city'])
-                    && request.resource.data.buyer.name is string
-                    && request.resource.data.buyer.name.size() > 0
-                    && request.resource.data.buyer.name.size() <= 120
-                    && request.resource.data.buyer.phone is string
-                    && request.resource.data.buyer.phone.size() > 0
-                    && request.resource.data.buyer.phone.size() <= 40
-                    && request.resource.data.buyer.address is string
-                    && request.resource.data.buyer.address.size() > 0
-                    && request.resource.data.buyer.address.size() <= 200
-                    && request.resource.data.buyer.city is string
-                    && request.resource.data.buyer.city.size() > 0
-                    && request.resource.data.buyer.city.size() <= 100
-                    && (!('notes' in request.resource.data.buyer)
-                        || (request.resource.data.buyer.notes is string
-                            && request.resource.data.buyer.notes.size() <= 500))
+                    && datosEnvioValidos(request.resource.data.buyer)
                     // Productos y total
                     && request.resource.data.items is list
                     && request.resource.data.items.size() > 0

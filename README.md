@@ -11,6 +11,7 @@ la **navegación con React Router** (rutas anidadas con un layout compartido) y 
 En esta etapa se integró **Firebase**: el catálogo se lee de **Cloud Firestore**, los usuarios se **registran, inician y cierran sesión**
 con **Firebase Authentication** (el estado se maneja con un `AuthContext` y se mantiene al recargar la página), el **checkout está protegido**
 (solo lo usan usuarios con sesión iniciada) y cada compra se guarda como una **orden** en Firestore, asociada al usuario.
+Con la sesión iniciada, el usuario tiene un **menú de cuenta** (círculo con la inicial de su email) para guardar sus **datos de envío**, **cambiar su contraseña** y cerrar sesión.
 
 La interfaz sigue la **identidad visual refinada** de la marca (ver "Identidad visual"), es **responsive** (menú hamburguesa y
 grilla de 2 columnas en celulares) y la home incluye un **banner en forma de carrusel cuyas promociones se editan sin tocar el código**
@@ -90,6 +91,8 @@ Así el Navbar, el `CartWidget` y el Footer están presentes en todas las págin
           <Route path="/login" element={<AuthForm modo="login" />} />
           <Route path="/registro" element={<AuthForm modo="registro" />} />
           <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+          <Route path="/cuenta/envio" element={<ProtectedRoute><DatosEnvio /></ProtectedRoute>} />
+          <Route path="/cuenta/contrasena" element={<ProtectedRoute><CambiarContrasena /></ProtectedRoute>} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
@@ -107,6 +110,8 @@ Así el Navbar, el `CartWidget` y el Footer están presentes en todas las págin
 | `/login` | Inicio de sesión (`AuthForm modo="login"`). Si ya hay sesión iniciada, redirige a donde el usuario quería ir (o al inicio). |
 | `/registro` | Registro con email y contraseña (`AuthForm modo="registro"`) |
 | `/checkout` | **Ruta protegida** (`ProtectedRoute` + `Checkout`): datos de entrega y confirmación de la compra. Sin sesión iniciada redirige a `/login`; con el carrito vacío redirige a `/cart`. |
+| `/cuenta/envio` | **Ruta protegida** (`DatosEnvio`): el usuario guarda su dirección de entrega para que el checkout la complete sola. |
+| `/cuenta/contrasena` | **Ruta protegida** (`CambiarContrasena`): cambio de contraseña (pide la actual). |
 | `*` | Error 404: página no encontrada (`NotFound`) |
 
 - **Links sin recargas:** toda la navegación interna usa `Link` / `NavLink` (nunca `<a>`), así que la página no se recarga y el estado de React se conserva.
@@ -121,9 +126,10 @@ Todos los componentes viven en `src/components`, cada uno con su archivo `.jsx` 
 | Componente | Descripción |
 |------------|-------------|
 | `Layout` | Estructura compartida por todas las rutas: `Navbar`, `Footer` y un `<Outlet />` donde se dibuja la página de la ruta actual. También incluye `ScrollToTop`. |
-| `Navbar` | Barra de navegación fija en la parte superior: arriba de todo se ve **integrada en la página** (transparente) y al bajar más de 24 px se convierte en una **píldora de vidrio translúcido** y redondeada (estilo liquid glass). Muestra el logo horizontal de la marca, las categorías de productos (generadas con `map` a partir de `src/constants/categories.js`) como `NavLink` a `/category/:categoryId`, el `UserWidget` y el `CartWidget`. En pantallas de hasta 900 px las categorías pasan a un **menú desplegable tipo hamburguesa**: se abre y cierra con el botón (`aria-expanded`), se cierra al elegir una categoría, con la tecla Escape o al tocar fuera de la barra. |
+| `Navbar` | Barra de navegación fija en la parte superior: arriba de todo se ve **integrada en la página** (transparente) y al bajar más de 24 px se convierte en una **píldora de vidrio translúcido** y redondeada (estilo liquid glass). Muestra el logo horizontal de la marca, las categorías de productos (generadas con `map` a partir de `src/constants/categories.js`) como `NavLink` a `/category/:categoryId`, el `UserWidget` y el `CartWidget` (dos círculos del mismo tamaño). En pantallas de hasta 1024 px las categorías pasan a un **menú desplegable tipo hamburguesa**: se abre y cierra con el botón (`aria-expanded`), se cierra al elegir una categoría, con la tecla Escape o al tocar fuera de la barra. |
 | `Banner` | Carrusel de novedades y promociones de la home. Lee sus diapositivas de un JSON editable (ver más abajo), avanza solo cada 6 segundos, se pausa con el mouse encima, con el foco o con el botón de pausa, y se puede recorrer con las flechas, los puntos, deslizando con el dedo o con las teclas ← →. |
-| `CartWidget` | Link a `/cart` con el ícono y un círculo con la cantidad total de unidades (`totalItems`, que lee del contexto con `useCart`). Con el carrito vacío no muestra el número. |
+| `BagIcon` | Ícono de bolsa de compras (SVG). Con `filled` se rellena del mismo color que el contorno. |
+| `CartWidget` | Link a `/cart` con el ícono de **bolsa**: **vacía** (solo contorno) si no hay productos y **llena** (del mismo color que el contorno) cuando hay, junto con un círculo con la cantidad total de unidades (`totalItems`, que lee del contexto con `useCart`). Con el carrito vacío no muestra el número. |
 | `ItemListContainer` | Contenedor del catálogo. Lee el `id` de la URL (`/category/:id`), obtiene los productos con `getProducts(categoryId)` dentro de un `useEffect`, los guarda en el estado `items` y se los pasa por props a `ItemList`. Maneja los estados de carga y de error. En la home (`/`) muestra el `Banner` arriba; en todas las rutas muestra el título, la cantidad de productos, el buscador y el orden (`ProductToolbar`). No hace el `.map()`. |
 | `ProductToolbar` | Buscador y selector de orden (orden de la lista, precio de menor a mayor o de mayor a menor). La búsqueda mira nombre, descripción y presentación, sin distinguir mayúsculas ni tildes; sin coincidencias se ofrece "Limpiar búsqueda". La lógica está en `utils/filtrarProductos.js`. |
 | `ItemList` | Recibe los productos por props (`items`), los recorre con `.map()` y renderiza un `Item` por cada uno, usando el `id` del producto como `key`. En celulares (hasta 600 px) la grilla pasa a **2 columnas**, de modo que en cada pantalla se ven 4 productos (2 filas de 2). |
@@ -135,9 +141,11 @@ Todos los componentes viven en `src/components`, cada uno con su archivo `.jsx` 
 | `Cart` | Página del carrito (ruta `/cart`). Con el carrito vacío muestra un mensaje y un link para volver al catálogo. Con productos lista, de cada uno, nombre, cantidad, precio unitario y subtotal, con un botón "Eliminar" por producto; además muestra el **total**, el botón "Vaciar carrito" y "Finalizar compra", que lleva a `/checkout`. |
 | `ResumenCompra` | Resumen (unidades, descuento por pack y total) que comparten el carrito y el checkout. |
 | `AuthForm` | Formulario de **inicio de sesión** y de **registro** (la prop `modo` elige cuál). Valida email y contraseña, muestra los errores de Firebase traducidos (cuenta repetida, contraseña débil, credenciales incorrectas...) y, al ingresar, redirige a la página que el usuario quería ver. |
-| `ProtectedRoute` | Envuelve una ruta que requiere sesión. Mientras Firebase valida la sesión muestra un indicador de carga; sin usuario redirige a `/login` guardando a dónde quería ir. |
-| `UserWidget` | En el Navbar: link "Ingresar" si no hay sesión; con sesión, el **email del usuario** y el botón **"Cerrar sesión"** (en celulares van dentro del menú desplegable). |
-| `Checkout` | Página `/checkout`: muestra el pedido y el resumen, incluye el `CheckoutForm` y genera la orden con `crearOrden`. Antes de crearla vuelve a verificar que haya usuario y productos. Si sale bien muestra el **id de la orden** y recién ahí **vacía el carrito**; si falla, muestra el error y el carrito queda intacto. |
+| `ProtectedRoute` | Envuelve una ruta que requiere sesión. Mientras Firebase valida la sesión muestra un indicador de carga; sin usuario redirige a `/login` con un aviso (prop `aviso`) y guardando a dónde quería ir. |
+| `UserWidget` | En el Navbar, un círculo del mismo tamaño que el del carrito. Sin sesión es solo el **ícono de persona** (link a `/login`, con `aria-label="Iniciar sesión"`). Con sesión es un **botón con la inicial del email en mayúscula** que abre el **menú de la cuenta**: email del usuario, "Datos de envío", "Cambiar contraseña" y "Cerrar sesión". El menú se cierra con Escape (el foco vuelve al botón), al tocar fuera, al elegir una opción o al abrir el menú de categorías. |
+| `DatosEnvio` | Página `/cuenta/envio`: lee los datos guardados del usuario (`services/users.js`) y los muestra en el `CheckoutForm` para editarlos y guardarlos. |
+| `CambiarContrasena` | Página `/cuenta/contrasena`: contraseña actual, nueva y repetición. Valida (mínimo 6 caracteres, que coincidan y que la nueva sea distinta) y muestra mensajes claros si la actual es incorrecta o la sesión es muy vieja. |
+| `Checkout` | Página `/checkout`: muestra el pedido y el resumen, incluye el `CheckoutForm` (ya completado con los datos de envío guardados en la cuenta, si los hay) y genera la orden con `crearOrden`. Antes de crearla vuelve a verificar que haya usuario y productos. Si sale bien muestra el **id de la orden** y recién ahí **vacía el carrito**; si falla, muestra el error y el carrito queda intacto. |
 | `CheckoutForm` | Formulario de entrega (nombre y apellido, teléfono, dirección, ciudad e información adicional opcional) con validación: no entrega los datos si falta alguno o es inválido. Muestra el email de la cuenta con la que se compra. |
 | `Footer` | Pie de página sobre fondo oscuro con la versión del logo para fondo oscuro, las categorías y links a la tienda y al carrito (con `Link`). Se muestra en todas las rutas gracias al `Layout`. |
 | `NotFound` | Mensaje para rutas o categorías inexistentes, con un link al catálogo. |
@@ -245,6 +253,7 @@ La conexión se centraliza en **`src/firebase/config.js`**: inicializa la app co
 | `products` | Un documento por producto (el id del documento es el id del producto), con `order` para ordenar. | `services/products.js` (listado, categoría con `where` y detalle con `getDoc`) |
 | `orders` | Una orden por compra, asociada al usuario autenticado. | `services/orders.js` (`addDoc`) |
 | `banners` | Una diapositiva por documento (mismos campos que `banners.json`, más `order`). | `services/banners.js` |
+| `users` | Un documento por usuario (el id es su `uid`) con sus **datos de envío** (`shipping`: `name`, `phone`, `address`, `city`, `notes`) y `updatedAt`. Cada usuario solo accede al suyo. | `services/users.js` (`getDoc` / `setDoc`) |
 
 **Documento de `products`** (el id del documento, por ejemplo `"2"`, es el id del producto; `aromas`, `presentation` y `container` aparecen solo en los productos que los tienen):
 
@@ -301,11 +310,15 @@ La conexión se centraliza en **`src/firebase/config.js`**: inicializa la app co
 ### Autenticación
 
 - **`src/context/AuthContext.jsx`** exporta `AuthContext`, `AuthProvider` y el hook `useAuth()`. Expone `user` (el usuario actual o `null`), `loading`
-  (true mientras Firebase valida la sesión guardada) y las funciones `register`, `login` y `logout`.
+  (true mientras Firebase valida la sesión guardada) y las funciones `register`, `login`, `logout` y `changePassword`.
 - El estado se mantiene con **`onAuthStateChanged`** (en `services/auth.js`, usado desde el Provider): Firebase guarda la sesión en el navegador, así que al recargar
   la página el usuario sigue conectado. Al cerrar sesión llega `null` y la interfaz deja de mostrar el email.
 - **Registro** (`/registro`) e **inicio de sesión** (`/login`) con email y contraseña. Los errores de Firebase se traducen a mensajes claros (`utils/erroresAuth.js`).
-- Con sesión iniciada, el Navbar muestra el **email** y el botón **"Cerrar sesión"**.
+- Con sesión iniciada, el Navbar muestra un **círculo con la inicial del email**. Al tocarlo se abre el menú de la cuenta (email, datos de envío, cambiar contraseña y cerrar sesión).
+- **Cambio de contraseña** (`changePassword` → `services/auth.js`): Firebase exige confirmar la contraseña actual, así que primero se reautentica con `reauthenticateWithCredential`
+  y después se llama a `updatePassword`.
+- **Datos de envío** (`/cuenta/envio`): se guardan con `setDoc(..., { merge: true })` en `users/{uid}`. Al finalizar una compra, el checkout los usa para completar el formulario
+  (si no se pueden leer, el formulario simplemente queda vacío).
 
 ### Checkout protegido y órdenes
 
@@ -324,6 +337,7 @@ La seguridad **no depende de la interfaz**: aunque alguien llame a Firestore por
   fecha sea la del servidor. Nadie puede leer, modificar ni borrar órdenes desde el sitio (se consultan en la consola de Firebase).
 - `products`: lectura pública. Solo un usuario autenticado puede **restar** stock (única modificación permitida); no se pueden crear ni borrar productos.
 - `banners`: lectura pública, sin escritura.
+- `users/{uid}`: solo el propio usuario puede leer y guardar su documento; se valida la forma de los datos de envío (los mismos campos y límites que el comprador de una orden) y que `updatedAt` sea la fecha del servidor. No se puede borrar.
 
 ### Si la base es la del sitio ya publicado
 
@@ -341,6 +355,10 @@ el campo `img` que carga `npm run seed`), y el banner usa `banners.json` si las 
 5. Publicá las reglas de `firestore.rules` (Firestore Database → Reglas → pegar → Publicar). **No dejes el modo de prueba.**
 6. Reiniciá `npm run dev`. Al desplegar (por ejemplo en Vercel), cargá las mismas variables en *Environment Variables* y agregá el dominio de producción en
    *Authentication → Configuración → Dominios autorizados*.
+
+**Si al confirmar la compra (o al guardar los datos de envío) aparece `Missing or insufficient permissions`:** Firestore está rechazando la operación porque las reglas publicadas no son las de este
+repositorio (por ejemplo, quedaron las de una versión anterior, sin la colección `users`). Volvé a pegar y publicar `firestore.rules` (paso 5) y comprobá en *Firestore Database → Reglas* que el texto
+publicado incluya `request.auth` y `userId`. Esto se arregla en la consola de Firebase: no hace falta volver a desplegar el sitio.
 
 `npm run seed -- --force` reemplaza productos y banners (vuelve el stock a los valores del archivo); con las reglas publicadas hay que volver a permitir la escritura.
 
@@ -361,7 +379,8 @@ El diseño sigue el documento *Lila del Alba — Identidad mejorada* (sistema de
 | Noche | `#1C1535` | Texto, pie de página y estado "hover" de los botones |
 
 - Los colores están definidos como variables CSS en `src/index.css` (`--lila`, `--violeta`, `--amanecer`, `--bruma`, `--noche`), junto con la tipografía, el radio de los bordes y la sombra.
-- **Logos** (en `src/assets`, extraídos del SVG de la marca): `logo-horizontal.svg` (cabecera web), `logo-horizontal-oscuro.svg` (sobre fondo oscuro, usado en el pie de página) y `logo-flor.svg` (isotipo, usado en el carrito vacío).
+- **Logos** (en `src/assets`, extraídos del SVG de la marca): `logo-horizontal.svg` (cabecera web), `logo-horizontal-oscuro.svg` (sobre fondo oscuro, usado en el pie de página) y `logo-flor.svg` (isotipo, usado en el inicio de sesión y el registro). También están las ilustraciones `carrito-vacio.svg` (página del carrito vacío) y
+  `gracias-por-tu-compra.svg` (compra confirmada).
 - **Íconos** (en `public`): `favicon.svg` y `favicon.png` (ícono de app) y `apple-touch-icon.png`.
 - **Tipografía:** Outfit (pesos 400, 500, 600 y 700), cargada desde Google Fonts en `index.html`, igual que en el sitio de la marca. Se define en la variable `--fuente-texto` (y `--fuente-titulos`) de `src/index.css`, con fuentes del sistema como respaldo.
 
@@ -423,7 +442,8 @@ Por seguridad, `getBanners()` valida lo que lee: descarta las diapositivas sin t
 
 ## Diseño responsive
 
-- **Pantallas de hasta 900 px (tablet y celular):** las categorías pasan a un menú hamburguesa y el Navbar queda en una sola fila (logo, carrito y botón del menú).
+- **Pantallas de hasta 1024 px (tablet y celular):** las categorías pasan a un menú hamburguesa y el Navbar queda en una sola fila (logo, cuenta, carrito y botón del menú). Los círculos son siempre redondos
+  (`--circulo-navbar`, 46 px; 40 px en pantallas de hasta 360 px). El menú de la cuenta se ajusta al ancho de la pantalla.
 - **Celulares (hasta 600 px):** la lista de productos usa 2 columnas con cards compactas (nombre en 2 líneas como máximo, precio y botón debajo), por lo que se ven **4 productos por pantalla**.
 - El banner conserva el diseño del sitio de la marca: texto a la izquierda y foto a la derecha en pantallas grandes; texto arriba y foto abajo en celulares.
 
@@ -433,8 +453,11 @@ Por seguridad, `getBanners()` valida lo que lee: descarta las diapositivas sin t
 - El **stock es de ejemplo**: con Firebase, cargá los valores reales en cada documento de `products`.
 - Las fotos de `public/productos` son las del sitio de la marca ([liladelalba.vercel.app](https://liladelalba.vercel.app/)). Los productos que ahí
   no tienen una foto propia comparten la de su categoría, igual que en el sitio: cremas (`cremas.webp`), aceites (`aceites.webp`),
-  shampoo sólido (`shampoo-solido.webp`) y hogar (`hogar.webp`, para el difusor de 60 ml, el difusor para auto y el spray textil).
+  shampoo sólido (`shampoo-solido.webp`) y hogar (`hogar.webp`, que también usa la primera diapositiva del banner).
+  El difusor de 60 ml (`difusor-60ml.jpg`), el difusor para auto de 9 ml (`difusor-auto-9ml.jpg`) y el spray textil (`spray-textil.jpg`) tienen foto propia.
   Los dos jabones sin aroma (con y sin arcilla) usan la misma foto, como en el sitio.
+- **Si cambiás la foto de un producto**, la ruta (`img`) vive en cada documento de `products` en Firestore: además de subir el archivo a `public/productos`,
+  editá ese campo en la consola de Firebase (por ejemplo `/productos/spray-textil.jpg`). El archivo `scripts/data/products.js` solo se usa para la carga inicial.
 
 ## Estructura del proyecto
 
@@ -456,15 +479,21 @@ src/
 ├── assets/
 │   ├── logo-horizontal.svg
 │   ├── logo-horizontal-oscuro.svg
-│   └── logo-flor.svg
+│   ├── logo-flor.svg
+│   ├── carrito-vacio.svg             # ilustración del carrito vacío
+│   └── gracias-por-tu-compra.svg     # ilustración de la compra confirmada
 ├── components/
 │   ├── AuthForm.jsx / .css          # inicio de sesión y registro
 │   ├── Banner.jsx / .css
 │   ├── Cargando.jsx / .css
 │   ├── Cart.jsx / .css
+│   ├── BagIcon.jsx                  # ícono de bolsa (vacía o llena)
+│   ├── CambiarContrasena.jsx        # página /cuenta/contrasena
 │   ├── CartWidget.jsx / .css
 │   ├── Checkout.jsx / .css          # página /checkout (datos de entrega y confirmación)
-│   ├── CheckoutForm.jsx / .css
+│   ├── CheckoutForm.jsx / .css      # formulario de entrega (checkout y datos de envío de la cuenta)
+│   ├── Cuenta.css                   # estilos de la página de datos de envío
+│   ├── DatosEnvio.jsx               # página /cuenta/envio
 │   ├── Footer.jsx / .css
 │   ├── Item.jsx / .css
 │   ├── ItemCount.jsx / .css
@@ -480,7 +509,7 @@ src/
 │   ├── ProtectedRoute.jsx           # protege rutas que requieren sesión
 │   ├── ResumenCompra.jsx            # resumen compartido por carrito y checkout
 │   ├── ScrollToTop.jsx
-│   └── UserWidget.jsx / .css        # "Ingresar" o email + "Cerrar sesión"
+│   └── UserWidget.jsx / .css        # círculo de la cuenta: ícono de ingreso o inicial + menú
 ├── constants/
 │   └── categories.js     # categorías de la tienda
 ├── context/
@@ -489,10 +518,11 @@ src/
 ├── firebase/
 │   └── config.js         # inicialización de Firebase: exporta db y auth (variables de entorno)
 ├── services/
-│   ├── auth.js           # registrar, iniciar y cerrar sesión; observar la sesión
+│   ├── auth.js           # registrar, iniciar y cerrar sesión; cambiar contraseña; observar la sesión
 │   ├── banners.js        # getBanners: lee y valida las diapositivas del carrusel
 │   ├── orders.js         # crearOrden: addDoc en "orders" + descuento de stock
-│   └── products.js       # getProducts y getProductById (Firestore)
+│   ├── products.js       # getProducts y getProductById (Firestore)
+│   └── users.js          # datos de envío del usuario: obtenerDatosEnvio y guardarDatosEnvio (colección "users")
 ├── utils/
 │   ├── erroresAuth.js    # mensajes en español para los errores de Authentication
 │   ├── filtrarProductos.js  # búsqueda y orden de la lista
