@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 import { BaseAjenaError, crearOrden, SinStockError } from '../services/orders'
 import { formatearPrecio } from '../utils/formatearPrecio'
-import logoFlor from '../assets/logo-flor.svg'
+import graciasPorCompra from '../assets/graciasxcompra.svg'
 import './Checkout.css'
 
 // Mensaje claro para cada motivo por el que puede fallar la generación de la orden
@@ -80,7 +80,7 @@ function Checkout() {
   if (orden) {
     return (
       <main className="cart cart--vacio">
-        <img className="cart__flor" src={logoFlor} alt="" />
+        <img className="cart__flor" src={graciasPorCompra} alt="" />
         <h1 className="cart__titulo">¡Gracias por tu compra!</h1>
         <div className="cart__orden" role="status">
           <p>Tu compra fue registrada. Tu número de orden es</p>
