@@ -324,7 +324,7 @@ export const products = [
     name: 'Difusor ambiental 60 ml',
     price: 3000,
     category: 'hogar',
-    img: '/productos/hogar.webp',
+    img: '/productos/difusor-60ml.jpg',
     stock: 30,
     description:
       'Difusor con varillas para perfumar ambientes chicos, con el aroma que elijas.',
@@ -366,7 +366,7 @@ export const products = [
     name: 'Difusor para auto 9 ml',
     price: 4800,
     category: 'hogar',
-    img: '/productos/hogar.webp',
+    img: '/productos/difusor-auto-9ml.jpg',
     stock: 24,
     description: 'Difusor de 9 ml para perfumar el interior del auto, con el aroma que elijas.',
     presentation: '9 ml',
@@ -378,7 +378,7 @@ export const products = [
     name: 'Spray textil 250 ml',
     price: 6500,
     category: 'hogar',
-    img: '/productos/hogar.webp',
+    img: '/productos/spray-textil.jpg',
     stock: 17,
     description:
       'Spray para perfumar telas, cortinas, almohadones y ropa de cama, con el aroma que elijas.',
